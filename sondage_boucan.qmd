@@ -15,6 +15,7 @@ format:
     grid:
       body-width: 1400px
       margin-width: 300px
+self-contained: true
 ---
 
 # Science ouverte et accessibilité
