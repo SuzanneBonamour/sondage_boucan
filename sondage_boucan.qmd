@@ -1,0 +1,175 @@
+---
+title: "**Résultats du sondage** : Etat des lieux du fonctionnement du Boucan"
+format: html
+editor: visual
+author: Suzanne Bonamour (Boucan des Paillettes)
+lang: fr
+---
+
+# Science ouverte et accessibilité
+
+Le code (script R) permettant l'analyses des données est disponible [ici](https://github.com/SuzanneBonamour/sondage_boucan/tree/main) en accès libre via mon compte GitHub.
+
+Les données d'origine ne sont pas mise en accès libre, pour maintenir l'anonymat des répondant.es.
+
+```{r echo=TRUE, include=FALSE}
+library(readr)
+library(tidyverse)
+```
+
+# Données d'origine
+
+```{r echo=TRUE, include=FALSE}
+dt1 <- read_delim("C:/Users/suzan/Documents/Boucan des Paillettes/Sondage/1) Data/results-survey648752(1).csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+```
+
+# Glossaire
+
+id = `id. ID de la réponse`
+
+temps_boucan = `Q372163. Depuis combien de temps avez-vous rejoint le Boucan ?`
+
+combien_commission = `Q990553. Dans combien de commissions êtes-vous inscrit.e ?`
+
+combien_commmision_actif = `Q793197. Dans combien de commissions êtes-vous réellement actif.ve ?`
+
+freq_plen = `Q990552. A quelle fréquence venez-vous aux réunions plénières ?`
+
+evol_invest = `Q990554. Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ?`
+
+evol_invest_com = `Q990554[comment]. Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ? [Commentaire]`
+
+evol_ressenti = `Q990555. Votre ressenti au sein de l’association a-t-il évolué depuis votre adhésion ?`
+
+problem = `Q674946. Avez-vous rencontré des situations qui vous ont posé problème dans l’association ? `
+
+problem_com = `Q674946[comment]. Avez-vous rencontré des situations qui vous ont posé problème dans l’association ?  [Commentaire]`
+
+apport = `Q990556. Qu’est-ce que vous apporte le Boucan personnellement ?`
+
+ajout_profil = `Q990557. Avez-vous des choses à ajouter sur votre profil au Boucan ?`
+
+ressenti = `Q990558. Globalement, comment vous sentez-vous au sein de l'association?`
+
+expression = `Q860601. Vous sentez-vous libre d’exprimer vos opinions ?`
+
+ecoute = `Q625295. Vous sentez-vous écouté.e au Boucan ?`
+
+inclusion = `Q295411. Vous sentez-vous facilement inclus.e au Boucan ?`
+
+bienveillance = `Q630865. Avez-vous le sentiment d’avoir des interactions globalement bienveillantes ?`
+
+bienetre = `Q990559. Avez-vous des choses à ajouter sur votre bien-être au Boucan ?`
+
+accueil = `Q990560. Comment avez-vous trouvé l’accueil au Boucan ?`
+
+accueil_com = `Q990560[comment]. Comment avez-vous trouvé l’accueil au Boucan ? [Commentaire]`
+
+connaissance = `Q990561. Avez-vous une connaissance suffisante du fonctionnement du Boucan pour pouvoir facilement vous y impliquer, prendre des décisions, des responsabilités ?`
+
+connaissance_com = `Q990561[comment]. Avez-vous une connaissance suffisante du fonctionnement du Boucan pour pouvoir facilement vous y impliquer, prendre des décisions, des responsabilités ? [Commentaire]`
+
+plen_fonc = `Q483205. Trouvez-vous les réunions plénières fonctionnelles et efficaces ?`
+
+plen_fonc_com = `Q990562. Vous pouvez vous exprimer ici sur le fonctionnement du Boucan si vous le souhaitez`
+
+commission_fonc = `Q617401. Trouvez-vous les commissions globalement fonctionnelles et efficaces ?`
+
+lien_commission_cc_plen = `Q595178. Pour les commissions : trouvez-vous fonctionnel le lien avec le Conseil Collégial et les réunions plénières ?`
+
+ref_commision_fonc = `Q141881. Pour les commissions : trouvez-vous fonctionnel le rôle attribué aux référent.e.s de commissions ?`
+
+orga_dans_commission_fonc = `Q915400. Pour les commissions : trouvez-vous fonctionnelle l'organisation au sein des commissions ?`
+
+orga_dans_commission_fonc_com = `Q915400[comment]. Pour les commissions : trouvez-vous fonctionnelle l'organisation au sein des commissions ? [Commentaire]`
+
+connaissance_envie_invest_dans_com = `Q253829. Pour les commissions : avez-vous une connaissance suffisante d’à quel point les personnes présentes souhaitent s’investir ?`
+
+commission_fonc_com = `Q990563. Vous pouvez vous exprimer ici sur le fonctionnement des commissions si vous le souhaitez`
+
+transparence_decision = `Q990564. Avez-vous l’impression que les prises de décision sont suffisamment transparentes ?`
+
+transparence_argent = `Q610635. Avez-vous l’impression que la gestion de l’argent est suffisamment transparente ?`
+
+horizontalite = `Q713862. Avez-vous le sentiment que la répartition du pouvoir et des responsabilités est équilibrée ?`
+
+horizontalite_com = `Q990565. Avez-vous des choses à ajouter sur l'horizontalité au Boucan ?`
+
+inclusion_queer = `Q990566. Sur votre identité queer : Est-ce que vous vous sentez inclus.e du fait de votre identité queer au sein du Boucan ?`
+
+inclusion_intersectionnelle = `Q990567. Sur les autres discriminations, seulement pour les personnes concernées : Est-ce que vous vous sentez inclus.e du fait de votre identité intersectionnelle au sein du Boucan ?`
+
+inclusion_com =`Q990568. Avez-vous des choses à ajouter sur l'inclusivité au Boucan ?`
+
+idee_plen_fonc =`Q990569. Avez-vous des idées pour améliorer le fonctionnement des réunions plénières ?`
+
+idee_commission_fonc = `Q427797. Avez-vous des idées pour améliorer le fonctionnement des commissions ? (Connaissance de l’investissement des autres, référent.e.s, lien entre le Conseil collégial et les réunions plénières...)`
+
+idee_inclusion = `Q276480. Avez-vous des idées pour améliorer l’inclusion ?`
+
+idee_horizontalite = `Q985032. Avez-vous des idées pour améliorer la prise de décision,  l’horizontalité et la répartition du pouvoir ?`
+
+idee_transparence_argent = `Q353448. Avez-vous des idées pour améliorer la gestion de l’argent et/ou sa transparence ?`
+
+idee_autre = `Q331405. Vous pouvez vous exprimer ici sur toute autre idée pour améliorer le fonctionnement au Boucan`
+
+```{r echo=TRUE, include=FALSE}
+dt2 <- dt1 %>% 
+  select(-"lastpage. Dernière page", -"startlanguage. Langue de départ",
+         -"seed. Tête de série", -"startdate. Date de lancement",
+         -"datestamp. Date de la dernière action",
+         -"submitdate. Date de soumission")
+
+dt3 <- dt2 %>% 
+  rename(id = `id. ID de la réponse`,
+         temps_boucan = `Q372163. Depuis combien de temps avez-vous rejoint le Boucan ?`,
+         combien_commission = `Q990553. Dans combien de commissions êtes-vous inscrit.e ?`,
+         combien_commmision_actif = `Q793197. Dans combien de commissions êtes-vous réellement actif.ve ?`,
+         freq_plen = `Q990552. A quelle fréquence venez-vous aux réunions plénières ?`,
+         evol_invest = `Q990554. Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ?`,
+         evol_invest_com = `Q990554[comment]. Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ? [Commentaire]`,
+         evol_ressenti = `Q990555. Votre ressenti au sein de l’association a-t-il évolué depuis votre adhésion ?`,
+         problem = `Q674946. Avez-vous rencontré des situations qui vous ont posé problème dans l’association ? `,
+         problem_com = `Q674946[comment]. Avez-vous rencontré des situations qui vous ont posé problème dans l’association ?  [Commentaire]`,
+         apport = `Q990556. Qu’est-ce que vous apporte le Boucan personnellement ?`,
+         ajout_profil = `Q990557. Avez-vous des choses à ajouter sur votre profil au Boucan ?`,
+         ressenti = `Q990558. Globalement, comment vous sentez-vous au sein de l'association?`,
+         expression = `Q860601. Vous sentez-vous libre d’exprimer vos opinions ?`,
+         ecoute = `Q625295. Vous sentez-vous écouté.e au Boucan ?`,
+         inclusion = `Q295411. Vous sentez-vous facilement inclus.e au Boucan ?`,
+         bienveillance = `Q630865. Avez-vous le sentiment d’avoir des interactions globalement bienveillantes ?`,
+         bienetre_com = `Q990559. Avez-vous des choses à ajouter sur votre bien-être au Boucan ?`,
+         accueil = `Q990560. Comment avez-vous trouvé l’accueil au Boucan ?`,
+         accueil_com = `Q990560[comment]. Comment avez-vous trouvé l’accueil au Boucan ? [Commentaire]`,
+         connaissance = `Q990561. Avez-vous une connaissance suffisante du fonctionnement du Boucan pour pouvoir facilement vous y impliquer, prendre des décisions, des responsabilités ?`,
+         connaissance_com = `Q990561[comment]. Avez-vous une connaissance suffisante du fonctionnement du Boucan pour pouvoir facilement vous y impliquer, prendre des décisions, des responsabilités ? [Commentaire]`,
+         plen_fonc = `Q483205. Trouvez-vous les réunions plénières fonctionnelles et efficaces ?`,
+         plen_fonc_com = `Q990562. Vous pouvez vous exprimer ici sur le fonctionnement du Boucan si vous le souhaitez`,
+         commission_fonc = `Q617401. Trouvez-vous les commissions globalement fonctionnelles et efficaces ?`,
+         lien_commission_cc_plen = `Q595178. Pour les commissions : trouvez-vous fonctionnel le lien avec le Conseil Collégial et les réunions plénières ?`,
+         ref_commision_fonc = `Q141881. Pour les commissions : trouvez-vous fonctionnel le rôle attribué aux référent.e.s de commissions ?`,
+         orga_dans_commission_fonc = `Q915400. Pour les commissions : trouvez-vous fonctionnelle l'organisation au sein des commissions ?`,
+         orga_dans_commission_fonc_com = `Q915400[comment]. Pour les commissions : trouvez-vous fonctionnelle l'organisation au sein des commissions ? [Commentaire]`,
+         connaissance_envie_invest_dans_com = `Q253829. Pour les commissions : avez-vous une connaissance suffisante d’à quel point les personnes présentes souhaitent s’investir ?`,
+         commission_fonc_com = `Q990563. Vous pouvez vous exprimer ici sur le fonctionnement des commissions si vous le souhaitez`,
+         transparence_decision = `Q990564. Avez-vous l’impression que les prises de décision sont suffisamment transparentes ?`,
+         transparence_argent = `Q610635. Avez-vous l’impression que la gestion de l’argent est suffisamment transparente ?`,
+         horizontalite = `Q713862. Avez-vous le sentiment que la répartition du pouvoir et des responsabilités est équilibrée ?`,
+         horizontalite_com = `Q990565. Avez-vous des choses à ajouter sur l'horizontalité au Boucan ?`,
+         inclusion_id_queer = `Q990566. Sur votre identité queer : Est-ce que vous vous sentez inclus.e du fait de votre identité queer au sein du Boucan ?`,
+         inclusion_intersectionnelle = `Q990567. Sur les autres discriminations, seulement pour les personnes concernées : Est-ce que vous vous sentez inclus.e du fait de votre identité intersectionnelle au sein du Boucan ?`,
+         inclusion_com =`Q990568. Avez-vous des choses à ajouter sur l'inclusivité au Boucan ?`,
+         idee_plen_fonc =`Q990569. Avez-vous des idées pour améliorer le fonctionnement des réunions plénières ?`,
+         idee_commission_fonc = `Q427797. Avez-vous des idées pour améliorer le fonctionnement des commissions ? (Connaissance de l’investissement des autres, référent.e.s, lien entre le Conseil collégial et les réunions plénières...)`,
+         idee_inclusion = `Q276480. Avez-vous des idées pour améliorer l’inclusion ?`,
+         idee_horizontalite = `Q985032. Avez-vous des idées pour améliorer la prise de décision,  l’horizontalité et la répartition du pouvoir ?`,
+         idee_transparence_argent = `Q353448. Avez-vous des idées pour améliorer la gestion de l’argent et/ou sa transparence ?`,
+         idee_autre = `Q331405. Vous pouvez vous exprimer ici sur toute autre idée pour améliorer le fonctionnement au Boucan`)
+      
+```
+
+```{r echo=TRUE}
+head(dt3)
+```
+
