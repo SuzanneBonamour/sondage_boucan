@@ -1,9 +1,20 @@
 ---
 title: "**Résultats du sondage** : Etat des lieux du fonctionnement du Boucan"
-format: html
-editor: visual
 author: Suzanne Bonamour (Boucan des Paillettes)
 lang: fr
+date-format: long
+editor: visual
+format:
+  html:
+    theme: journal
+    toc: true
+    number-sections: true
+    fig-cap-location: top
+    link-citations: true
+    document-css: false
+    grid:
+      body-width: 1400px
+      margin-width: 300px
 ---
 
 # Science ouverte et accessibilité
@@ -15,9 +26,8 @@ Les données d'origine ne sont pas mise en accès libre, pour maintenir l'anonym
 ```{r echo=TRUE, include=FALSE}
 library(readr)
 library(tidyverse)
+library(ggplot2)
 ```
-
-# Données d'origine
 
 ```{r echo=TRUE, include=FALSE}
 dt1 <- read_delim("C:/Users/suzan/Documents/Boucan des Paillettes/Sondage/1) Data/results-survey648752(1).csv", 
@@ -169,7 +179,219 @@ dt3 <- dt2 %>%
       
 ```
 
+# Données d'origine
+
 ```{r echo=TRUE}
 head(dt3)
 ```
 
+# Etat des lieux
+
+29 questions ont pour buts d'établir un état des lieux du fonctionnement de l'association et du bien-être des adhérents et bénévoles.
+
+## Depuis combien de temps avez-vous rejoint le Boucan ?
+
+```{r echo=TRUE, include=FALSE}
+# mise en forme du tableau pour l'histogramme
+temps_boucan_dt <- as.data.frame(table(dt3$temps_boucan))
+
+# calcul des frequences
+temps_boucan_dt$Freq <- as.numeric(as.character(temps_boucan_dt$Freq))
+
+# Définir l'ordre logique
+ordre <- c("Moins de 6 mois",
+           "Entre 6 mois et 1 an",
+           "Entre 1 an et 1 an et demi",
+           "Plus d'1 an et demi")
+
+temps_boucan_dt$Var1 <- factor(temps_boucan_dt$Var1, levels = ordre)
+
+# Calcul des pourcentages
+temps_boucan_dt$pourcent <- round(temps_boucan_dt$Freq / sum(temps_boucan_dt$Freq) * 100)
+
+# Graphique
+ggplot(temps_boucan_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(pourcent, 1), " %")),
+            vjust = 2) +
+  labs(x = "Durée", y = "Nombre de personnes",
+       title = "Depuis combien de temps avez-vous rejoint le Boucan ?") +
+  scale_fill_manual(values = rainbow(length(ordre))) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+```
+
+## Dans combien de commissions êtes-vous inscrit.e ?
+
+combien_commission 
+
+## Dans combien de commissions êtes-vous réellement actif.ve ?
+
+
+combien_commmision_actif = `Q793197. `
+
+## A quelle fréquence venez-vous aux réunions plénières ?
+
+freq_plen = `Q990552. `
+
+## Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ?
+
+
+evol_invest = `Q990554. `
+
+### Commentaire
+
+evol_invest_com 
+
+## Votre ressenti au sein de l’association a-t-il évolué depuis votre adhésion ?
+
+evol_ressenti = `Q990555. `
+
+## Avez-vous rencontré des situations qui vous ont posé problème dans l’association ?
+
+problem = `Q674946.  `
+
+### Commentaire
+
+problem_com 
+ 
+## Qu’est-ce que vous apporte le Boucan personnellement ?
+
+apport = `Q990556. `
+
+## Avez-vous des choses à ajouter sur votre profil au Boucan ?
+
+ajout_profil = `Q990557. `
+
+## Globalement, comment vous sentez-vous au sein de l'association ?
+
+ressenti = `Q990558. `
+
+## Vous sentez-vous libre d’exprimer vos opinions ?
+
+expression = `Q860601. `
+
+## Vous sentez-vous écouté.e au Boucan ?
+
+ecoute = `Q625295. `
+
+## Vous sentez-vous facilement inclus.e au Boucan ?
+
+inclusion = 
+
+## Avez-vous le sentiment d’avoir des interactions globalement bienveillantes ?
+
+bienveillance = `Q630865. `
+
+## Avez-vous des choses à ajouter sur votre bien-être au Boucan ?
+
+bienetre = `Q990559. `
+
+## Comment avez-vous trouvé l’accueil au Boucan ?
+
+accueil = `Q990560. `
+
+### Commentaire 
+
+accueil_com = 
+
+## Avez-vous une connaissance suffisante du fonctionnement du Boucan pour pouvoir facilement vous y impliquer, prendre des décisions, des responsabilités ?
+
+connaissance = `Q990561. 
+
+### Commentaire 
+
+connaissance_com = 
+
+## Trouvez-vous les réunions plénières fonctionnelles et efficaces ?
+
+plen_fonc = `Q483205. `
+
+
+### Commentaire
+
+plen_fonc_com = 
+
+## Trouvez-vous les commissions globalement fonctionnelles et efficaces ?
+
+commission_fonc = `Q617401. `
+
+## Q595178. Pour les commissions : trouvez-vous fonctionnel le lien avec le Conseil Collégial et les réunions plénières ?
+
+lien_commission_cc_plen = `
+
+## Pour les commissions : trouvez-vous fonctionnel le rôle attribué aux référent.e.s de commissions ?
+
+ref_commision_fonc = `Q141881. `
+
+## Pour les commissions : trouvez-vous fonctionnelle l'organisation au sein des commissions ?
+
+orga_dans_commission_fonc = `Q915400. `
+
+### Commentaire
+
+orga_dans_commission_fonc_com = 
+
+## Pour les commissions : avez-vous une connaissance suffisante d’à quel point les personnes présentes souhaitent s’investir ?
+
+connaissance_envie_invest_dans_com = `Q253829. `
+
+## Vous pouvez vous exprimer ici sur le fonctionnement des commissions si vous le souhaitez`
+
+commission_fonc_com = `Q990563. 
+
+## Avez-vous l’impression que les prises de décision sont suffisamment transparentes ?
+
+transparence_decision = `Q990564. `
+
+## Avez-vous l’impression que la gestion de l’argent est suffisamment transparente ?
+
+transparence_argent = `Q610635. `
+
+## Avez-vous le sentiment que la répartition du pouvoir et des responsabilités est équilibrée ?
+
+horizontalite = `Q713862. `
+
+### Commentaire
+
+horizontalite_com = 
+
+## Sur votre identité queer : Est-ce que vous vous sentez inclus.e du fait de votre identité queer au sein du Boucan ?
+
+inclusion_queer = `Q990566. `
+
+## Sur les autres discriminations, seulement pour les personnes concernées : Est-ce que vous vous sentez inclus.e du fait de votre identité intersectionnelle au sein du Boucan ?
+
+inclusion_intersectionnelle = `Q990567. `
+
+### Commentaire
+
+inclusion_com =`Q990568. 
+
+# Idées d'amélioration
+
+## Avez-vous des idées pour améliorer le fonctionnement des réunions plénières ?`
+
+idee_plen_fonc =`Q990569. 
+
+## Avez-vous des idées pour améliorer le fonctionnement des commissions ? (Connaissance de l’investissement des autres, référent.e.s, lien entre le Conseil collégial et les réunions plénières...)`
+
+idee_commission_fonc = `Q427797. 
+
+## Avez-vous des idées pour améliorer l’inclusion ?`
+
+idee_inclusion = `Q276480. 
+
+## Avez-vous des idées pour améliorer la prise de décision,  l’horizontalité et la répartition du pouvoir ?`
+
+idee_horizontalite = `Q985032. 
+
+## Avez-vous des idées pour améliorer la gestion de l’argent et/ou sa transparence ?`
+
+idee_transparence_argent = `Q353448. 
+
+# Expression libre
+
+## Vous pouvez vous exprimer ici sur toute autre idée pour améliorer le fonctionnement au Boucan`
+
+idee_autre = `Q331405. 
