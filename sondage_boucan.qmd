@@ -1,6 +1,6 @@
 ---
-title: "**Résultats du sondage** : Etat des lieux du fonctionnement du Boucan"
-author: Suzanne Bonamour (Boucan des Paillettes)
+title: "**Résultats du sondage** : Etat des lieux du fonctionnement du Boucan de Paillettes"
+author: "Rédaction du sondage : commission horizontalité Interprétation des résultats : commission horizontalité Analyse des données : Suzanne/Suzee"
 lang: fr
 date-format: long
 editor: visual
@@ -18,16 +18,30 @@ format:
 self-contained: true
 ---
 
+![](logo_boucan.png){ width=150px }
+
+# Contexte 
+
+Ce sondage anonyme vise à faire l’état des lieux du fonctionnement du Boucan : vos ressentis et idées d’améliorations, il est purement informatif.
+
+Ce sondage a été rédigé par la commision horizontalité du Boucan des Paillettes, après vote en plénière. Le contenu du sondage a été validé en plénière par les membres de l'association. 
+
+La commission horizontalité a été créée le 27/08/2025 en plénière afin d’animer un travail pour améliorer le fonctionnement du Boucan.
+
 # Science ouverte et accessibilité
 
-Le code (script R) permettant l'analyses des données est disponible [ici](https://github.com/SuzanneBonamour/sondage_boucan/tree/main) en accès libre via mon compte GitHub.
+Le code (script R) permettant l'analyses des données est disponible [sur GitHub ici](https://github.com/SuzanneBonamour/sondage_boucan/tree/main).
 
 Les données d'origine ne sont pas mise en accès libre, pour maintenir l'anonymat des répondant.es.
 
 ```{r echo=TRUE, include=FALSE}
+library(tidytext)
 library(readr)
 library(tidyverse)
 library(ggplot2)
+library(stringr)
+library(wordcloud)
+library(textdata)
 ```
 
 ```{r echo=TRUE, include=FALSE}
@@ -35,95 +49,97 @@ dt1 <- read_delim("C:/Users/suzan/Documents/Boucan des Paillettes/Sondage/1) Dat
     delim = ";", escape_double = FALSE, trim_ws = TRUE)
 ```
 
+```{r echo=TRUE, include=FALSE}
 # Glossaire
 
-id = `id. ID de la réponse`
-
-temps_boucan = `Q372163. Depuis combien de temps avez-vous rejoint le Boucan ?`
-
-combien_commission = `Q990553. Dans combien de commissions êtes-vous inscrit.e ?`
-
-combien_commmision_actif = `Q793197. Dans combien de commissions êtes-vous réellement actif.ve ?`
-
-freq_plen = `Q990552. A quelle fréquence venez-vous aux réunions plénières ?`
-
-evol_invest = `Q990554. Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ?`
-
-evol_invest_com = `Q990554[comment]. Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ? [Commentaire]`
-
-evol_ressenti = `Q990555. Votre ressenti au sein de l’association a-t-il évolué depuis votre adhésion ?`
-
-problem = `Q674946. Avez-vous rencontré des situations qui vous ont posé problème dans l’association ? `
-
-problem_com = `Q674946[comment]. Avez-vous rencontré des situations qui vous ont posé problème dans l’association ?  [Commentaire]`
-
-apport = `Q990556. Qu’est-ce que vous apporte le Boucan personnellement ?`
-
-ajout_profil = `Q990557. Avez-vous des choses à ajouter sur votre profil au Boucan ?`
-
-ressenti = `Q990558. Globalement, comment vous sentez-vous au sein de l'association?`
-
-expression = `Q860601. Vous sentez-vous libre d’exprimer vos opinions ?`
-
-ecoute = `Q625295. Vous sentez-vous écouté.e au Boucan ?`
-
-inclusion = `Q295411. Vous sentez-vous facilement inclus.e au Boucan ?`
-
-bienveillance = `Q630865. Avez-vous le sentiment d’avoir des interactions globalement bienveillantes ?`
-
-bienetre = `Q990559. Avez-vous des choses à ajouter sur votre bien-être au Boucan ?`
-
-accueil = `Q990560. Comment avez-vous trouvé l’accueil au Boucan ?`
-
-accueil_com = `Q990560[comment]. Comment avez-vous trouvé l’accueil au Boucan ? [Commentaire]`
-
-connaissance = `Q990561. Avez-vous une connaissance suffisante du fonctionnement du Boucan pour pouvoir facilement vous y impliquer, prendre des décisions, des responsabilités ?`
-
-connaissance_com = `Q990561[comment]. Avez-vous une connaissance suffisante du fonctionnement du Boucan pour pouvoir facilement vous y impliquer, prendre des décisions, des responsabilités ? [Commentaire]`
-
-plen_fonc = `Q483205. Trouvez-vous les réunions plénières fonctionnelles et efficaces ?`
-
-plen_fonc_com = `Q990562. Vous pouvez vous exprimer ici sur le fonctionnement du Boucan si vous le souhaitez`
-
-commission_fonc = `Q617401. Trouvez-vous les commissions globalement fonctionnelles et efficaces ?`
-
-lien_commission_cc_plen = `Q595178. Pour les commissions : trouvez-vous fonctionnel le lien avec le Conseil Collégial et les réunions plénières ?`
-
-ref_commision_fonc = `Q141881. Pour les commissions : trouvez-vous fonctionnel le rôle attribué aux référent.e.s de commissions ?`
-
-orga_dans_commission_fonc = `Q915400. Pour les commissions : trouvez-vous fonctionnelle l'organisation au sein des commissions ?`
-
-orga_dans_commission_fonc_com = `Q915400[comment]. Pour les commissions : trouvez-vous fonctionnelle l'organisation au sein des commissions ? [Commentaire]`
-
-connaissance_envie_invest_dans_com = `Q253829. Pour les commissions : avez-vous une connaissance suffisante d’à quel point les personnes présentes souhaitent s’investir ?`
-
-commission_fonc_com = `Q990563. Vous pouvez vous exprimer ici sur le fonctionnement des commissions si vous le souhaitez`
-
-transparence_decision = `Q990564. Avez-vous l’impression que les prises de décision sont suffisamment transparentes ?`
-
-transparence_argent = `Q610635. Avez-vous l’impression que la gestion de l’argent est suffisamment transparente ?`
-
-horizontalite = `Q713862. Avez-vous le sentiment que la répartition du pouvoir et des responsabilités est équilibrée ?`
-
-horizontalite_com = `Q990565. Avez-vous des choses à ajouter sur l'horizontalité au Boucan ?`
-
-inclusion_queer = `Q990566. Sur votre identité queer : Est-ce que vous vous sentez inclus.e du fait de votre identité queer au sein du Boucan ?`
-
-inclusion_intersectionnelle = `Q990567. Sur les autres discriminations, seulement pour les personnes concernées : Est-ce que vous vous sentez inclus.e du fait de votre identité intersectionnelle au sein du Boucan ?`
-
-inclusion_com =`Q990568. Avez-vous des choses à ajouter sur l'inclusivité au Boucan ?`
-
-idee_plen_fonc =`Q990569. Avez-vous des idées pour améliorer le fonctionnement des réunions plénières ?`
-
-idee_commission_fonc = `Q427797. Avez-vous des idées pour améliorer le fonctionnement des commissions ? (Connaissance de l’investissement des autres, référent.e.s, lien entre le Conseil collégial et les réunions plénières...)`
-
-idee_inclusion = `Q276480. Avez-vous des idées pour améliorer l’inclusion ?`
-
-idee_horizontalite = `Q985032. Avez-vous des idées pour améliorer la prise de décision,  l’horizontalité et la répartition du pouvoir ?`
-
-idee_transparence_argent = `Q353448. Avez-vous des idées pour améliorer la gestion de l’argent et/ou sa transparence ?`
-
-idee_autre = `Q331405. Vous pouvez vous exprimer ici sur toute autre idée pour améliorer le fonctionnement au Boucan`
+# id = `id. ID de la réponse`
+# 
+# temps_boucan = `Q372163. Depuis combien de temps avez-vous rejoint le Boucan ?`
+# 
+# combien_commission = `Q990553. Dans combien de commissions êtes-vous inscrit.e ?`
+# 
+# combien_commmision_actif = `Q793197. Dans combien de commissions êtes-vous réellement actif.ve ?`
+# 
+# freq_plen = `Q990552. A quelle fréquence venez-vous aux réunions plénières ?`
+# 
+# evol_invest = `Q990554. Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ?`
+# 
+# evol_invest_com = `Q990554[comment]. Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ? [Commentaire]`
+# 
+# evol_ressenti = `Q990555. Votre ressenti au sein de l’association a-t-il évolué depuis votre adhésion ?`
+# 
+# problem = `Q674946. Avez-vous rencontré des situations qui vous ont posé problème dans l’association ? `
+# 
+# problem_com = `Q674946[comment]. Avez-vous rencontré des situations qui vous ont posé problème dans l’association ?  [Commentaire]`
+# 
+# apport = `Q990556. Qu’est-ce que vous apporte le Boucan personnellement ?`
+# 
+# ajout_profil = `Q990557. Avez-vous des choses à ajouter sur votre profil au Boucan ?`
+# 
+# ressenti = `Q990558. Globalement, comment vous sentez-vous au sein de l'association?`
+# 
+# expression = `Q860601. Vous sentez-vous libre d’exprimer vos opinions ?`
+# 
+# ecoute = `Q625295. Vous sentez-vous écouté.e au Boucan ?`
+# 
+# inclusion = `Q295411. Vous sentez-vous facilement inclus.e au Boucan ?`
+# 
+# bienveillance = `Q630865. Avez-vous le sentiment d’avoir des interactions globalement bienveillantes ?`
+# 
+# bienetre = `Q990559. Avez-vous des choses à ajouter sur votre bien-être au Boucan ?`
+# 
+# accueil = `Q990560. Comment avez-vous trouvé l’accueil au Boucan ?`
+# 
+# accueil_com = `Q990560[comment]. Comment avez-vous trouvé l’accueil au Boucan ? [Commentaire]`
+# 
+# connaissance = `Q990561. Avez-vous une connaissance suffisante du fonctionnement du Boucan pour pouvoir facilement vous y impliquer, prendre des décisions, des responsabilités ?`
+# 
+# connaissance_com = `Q990561[comment]. Avez-vous une connaissance suffisante du fonctionnement du Boucan pour pouvoir facilement vous y impliquer, prendre des décisions, des responsabilités ? [Commentaire]`
+# 
+# plen_fonc = `Q483205. Trouvez-vous les réunions plénières fonctionnelles et efficaces ?`
+# 
+# plen_fonc_com = `Q990562. Vous pouvez vous exprimer ici sur le fonctionnement du Boucan si vous le souhaitez`
+# 
+# commission_fonc = `Q617401. Trouvez-vous les commissions globalement fonctionnelles et efficaces ?`
+# 
+# lien_commission_cc_plen = `Q595178. Pour les commissions : trouvez-vous fonctionnel le lien avec le Conseil Collégial et les réunions plénières ?`
+# 
+# ref_commision_fonc = `Q141881. Pour les commissions : trouvez-vous fonctionnel le rôle attribué aux référent.e.s de commissions ?`
+# 
+# orga_dans_commission_fonc = `Q915400. Pour les commissions : trouvez-vous fonctionnelle l'organisation au sein des commissions ?`
+# 
+# orga_dans_commission_fonc_com = `Q915400[comment]. Pour les commissions : trouvez-vous fonctionnelle l'organisation au sein des commissions ? [Commentaire]`
+# 
+# connaissance_envie_invest_dans_com = `Q253829. Pour les commissions : avez-vous une connaissance suffisante d’à quel point les personnes présentes souhaitent s’investir ?`
+# 
+# commission_fonc_com = `Q990563. Vous pouvez vous exprimer ici sur le fonctionnement des commissions si vous le souhaitez`
+# 
+# transparence_decision = `Q990564. Avez-vous l’impression que les prises de décision sont suffisamment transparentes ?`
+# 
+# transparence_argent = `Q610635. Avez-vous l’impression que la gestion de l’argent est suffisamment transparente ?`
+# 
+# horizontalite = `Q713862. Avez-vous le sentiment que la répartition du pouvoir et des responsabilités est équilibrée ?`
+# 
+# horizontalite_com = `Q990565. Avez-vous des choses à ajouter sur l'horizontalité au Boucan ?`
+# 
+# inclusion_queer = `Q990566. Sur votre identité queer : Est-ce que vous vous sentez inclus.e du fait de votre identité queer au sein du Boucan ?`
+# 
+# inclusion_intersectionnelle = `Q990567. Sur les autres discriminations, seulement pour les personnes concernées : Est-ce que vous vous sentez inclus.e du fait de votre identité intersectionnelle au sein du Boucan ?`
+# 
+# inclusion_com =`Q990568. Avez-vous des choses à ajouter sur l'inclusivité au Boucan ?`
+# 
+# idee_plen_fonc =`Q990569. Avez-vous des idées pour améliorer le fonctionnement des réunions plénières ?`
+# 
+# idee_commission_fonc = `Q427797. Avez-vous des idées pour améliorer le fonctionnement des commissions ? (Connaissance de l’investissement des autres, référent.e.s, lien entre le Conseil collégial et les réunions plénières...)`
+# 
+# idee_inclusion = `Q276480. Avez-vous des idées pour améliorer l’inclusion ?`
+# 
+# idee_horizontalite = `Q985032. Avez-vous des idées pour améliorer la prise de décision,  l’horizontalité et la répartition du pouvoir ?`
+# 
+# idee_transparence_argent = `Q353448. Avez-vous des idées pour améliorer la gestion de l’argent et/ou sa transparence ?`
+# 
+# idee_autre = `Q331405. Vous pouvez vous exprimer ici sur toute autre idée pour améliorer le fonctionnement au Boucan`
+```
 
 ```{r echo=TRUE, include=FALSE}
 dt2 <- dt1 %>% 
@@ -168,7 +184,7 @@ dt3 <- dt2 %>%
          transparence_argent = `Q610635. Avez-vous l’impression que la gestion de l’argent est suffisamment transparente ?`,
          horizontalite = `Q713862. Avez-vous le sentiment que la répartition du pouvoir et des responsabilités est équilibrée ?`,
          horizontalite_com = `Q990565. Avez-vous des choses à ajouter sur l'horizontalité au Boucan ?`,
-         inclusion_id_queer = `Q990566. Sur votre identité queer : Est-ce que vous vous sentez inclus.e du fait de votre identité queer au sein du Boucan ?`,
+         inclusion_queer = `Q990566. Sur votre identité queer : Est-ce que vous vous sentez inclus.e du fait de votre identité queer au sein du Boucan ?`,
          inclusion_intersectionnelle = `Q990567. Sur les autres discriminations, seulement pour les personnes concernées : Est-ce que vous vous sentez inclus.e du fait de votre identité intersectionnelle au sein du Boucan ?`,
          inclusion_com =`Q990568. Avez-vous des choses à ajouter sur l'inclusivité au Boucan ?`,
          idee_plen_fonc =`Q990569. Avez-vous des idées pour améliorer le fonctionnement des réunions plénières ?`,
@@ -180,11 +196,20 @@ dt3 <- dt2 %>%
       
 ```
 
-# Données d'origine
 
 ```{r echo=TRUE}
-head(dt3)
+# Données d'origine
+
+# head(dt3)
 ```
+
+# Nombre de réponses 
+
+```{r echo=TRUE, include=FALSE}
+nb_rep = length(dt3$id)
+```
+
+Au total, `r prettyNum(nb_rep, big.mark = " ")` personnes ont répondu au sondage.
 
 # Etat des lieux
 
@@ -192,7 +217,7 @@ head(dt3)
 
 ## Depuis combien de temps avez-vous rejoint le Boucan ?
 
-```{r echo=TRUE, include=FALSE}
+```{r echo=FALSE, warning=FALSE}
 # mise en forme du tableau pour l'histogramme
 temps_boucan_dt <- as.data.frame(table(dt3$temps_boucan))
 
@@ -216,7 +241,7 @@ ggplot(temps_boucan_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(round(pourcent, 1), " %")),
             vjust = 2) +
   labs(x = "Durée", y = "Nombre de personnes",
-       title = "Depuis combien de temps avez-vous rejoint le Boucan ?") +
+       title = "") +
   scale_fill_manual(values = rainbow(length(ordre))) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
@@ -224,150 +249,2257 @@ ggplot(temps_boucan_dt, aes(x = Var1, y = Freq, fill = Var1)) +
 
 ## Dans combien de commissions êtes-vous inscrit.e ?
 
-combien_commission 
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+combien_commission_dt <- as.data.frame(table(dt3$combien_commission))
+
+# calcul des frequences
+combien_commission_dt$Freq <- as.numeric(as.character(combien_commission_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$combien_commission <- factor(dt3$combien_commission, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+combien_commission_dt <- as.data.frame(table(dt3$combien_commission))
+
+# Renommer proprement
+colnames(combien_commission_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+combien_commission_dt$pourcent <- round(combien_commission_dt$Freq / sum(combien_commission_dt$Freq) * 100)
+
+# Graphique
+ggplot(combien_commission_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "combien_commission", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(combien_commission_dt$Freq), 
+                                max(combien_commission_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
 
 ## Dans combien de commissions êtes-vous réellement actif.ve ?
 
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+combien_commmision_actif_dt <- as.data.frame(table(dt3$combien_commmision_actif))
 
-combien_commmision_actif = `Q793197. `
+# calcul des frequences
+combien_commmision_actif_dt$Freq <- as.numeric(as.character(combien_commmision_actif_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$combien_commmision_actif <- factor(dt3$combien_commmision_actif, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+combien_commmision_actif_dt <- as.data.frame(table(dt3$combien_commmision_actif))
+
+# Renommer proprement
+colnames(combien_commmision_actif_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+combien_commmision_actif_dt$pourcent <- round(combien_commmision_actif_dt$Freq / sum(combien_commmision_actif_dt$Freq) * 100)
+
+# Graphique
+ggplot(combien_commmision_actif_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "combien_commmision_actif", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(combien_commmision_actif_dt$Freq), 
+                                max(combien_commmision_actif_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
 
 ## A quelle fréquence venez-vous aux réunions plénières ?
 
-freq_plen = `Q990552. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+freq_plen_dt <- as.data.frame(table(dt3$freq_plen))
+
+# Définir l'ordre logique
+ordre <- c("Entre 2 et zéro par an",
+           "Quelques unes dans l'année",
+           "Environ la moitié",
+           "Toutes ou la plupart")
+
+# calcul des frequences
+freq_plen_dt$Freq <- as.numeric(as.character(freq_plen_dt$Freq))
+
+# mettre dans le bon ordre l'axe des x
+freq_plen_dt$Var1 <- factor(freq_plen_dt$Var1, levels = ordre)
+
+# Renommer proprement
+colnames(freq_plen_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+freq_plen_dt$pourcent <- round(freq_plen_dt$Freq / sum(freq_plen_dt$Freq) * 100)
+
+# Graphique
+ggplot(freq_plen_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(unique(freq_plen_dt$Var1)))) +
+  labs(x = "freq_plen", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  # scale_y_continuous(limits = c(min(freq_plen_dt$Freq),
+  #                               max(freq_plen_dt$Freq + 2))) +
+  expand_limits(y = max(freq_plen_dt$Freq) + 2) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
 
 ## Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ?
 
+```{r echo=FALSE, warning=FALSE}
+# # mise en forme du tableau pour l'histogramme
+# evol_invest_dt <- as.data.frame(table(dt3$evol_invest))
+# 
+# # calcul des frequences
+# evol_invest_dt$Freq <- as.numeric(as.character(evol_invest_dt$Freq))
+# 
+# # Définir toutes les modalités attendues
+# modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+# 
+# # Transformer en facteur avec tous les niveaux
+# dt3$evol_invest <- factor(dt3$evol_invest, levels = modalites)
+# 
+# # Table avec toutes les modalités (même à 0)
+# evol_invest_dt <- as.data.frame(table(dt3$evol_invest))
+# 
+# # Renommer proprement
+# colnames(evol_invest_dt) <- c("Var1", "Freq")
+# 
+# # Calcul des pourcentages
+# evol_invest_dt$pourcent <- round(evol_invest_dt$Freq / sum(evol_invest_dt$Freq) * 100)
+# 
+# # Graphique
+# ggplot(evol_invest_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+#   geom_bar(stat = "identity") +
+#   geom_text(aes(label = paste0(pourcent, " %")),
+#             vjust = -0.5) +
+#   scale_fill_manual(values = rainbow(length(modalites))) +
+#   labs(x = "evol_invest", y = "Nombre de personnes",
+#        title = "") +
+#   theme_minimal() +
+#   scale_y_continuous(limits = c(min(evol_invest_dt$Freq), max(evol_invest_dt$Freq + 2))) +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1),
+#         legend.position = "none")
+```
 
-evol_invest = `Q990554. `
+```{r echo=FALSE, warning=FALSE}
+# ---- 1. Données ----
+evol_invest_com_dt1 <- dt3 %>%
+  filter(!is.na(evol_invest_com)) %>%
+  select(id, evol_invest, evol_invest_com)
 
-### Commentaire
+nb_rep_evol_invest_com = length(evol_invest_com_dt1$evol_invest_com)
+```
 
-evol_invest_com 
+`r nb_rep_evol_invest_com` commentaires ont été écrits pour cette rubrique.
 
+```{r echo=FALSE, warning=FALSE}
+apport_dt2 <- evol_invest_com_dt1 %>%
+  mutate(
+    evolution = case_when(
+      str_detect(str_to_lower(evol_invest_com),
+                 "mieux|repris|réinvest|davantage|augmentation|de plus en plus ") ~ "Augmentation",
+
+      str_detect(str_to_lower(evol_invest_com),
+                 "pas d'évolution|stable|n'a pas changé|inchangé|ne change pas|
+Pas eu la possibilité") ~ "Stable",
+      str_detect(str_to_lower(evol_invest_com),
+                 "bais|diminu|désinvest|moins|épuis|fatigu|burn|manque de temps|pas assez|plus dispo|arrêt|peu|municipale|interpersonnelles|	venir|manque|ne se réunit plus") ~ "Diminution",
+      str_detect(str_to_lower(evol_invest_com),
+                       "venir") ~ "Diminution",
+      str_detect(str_to_lower(evol_invest_com),
+                 "Plus de disponibilité") ~ "Non classé",
+      str_detect(str_to_lower(evol_invest_com),
+                 "variable") ~ "Fluctuant",
+      TRUE ~ "Non classé"
+    )
+  )
+
+evol_counts <- apport_dt2 %>%
+  count(evolution, sort = TRUE) %>%
+  mutate(
+    evolution = factor(evolution,
+      levels = c("Augmentation", "Fluctuant", "Stable", "Diminution", "Non classé")
+    )
+  )
+
+cols_evol <- c(
+  "Augmentation" = "#1B9E77",
+  "Fluctuant"    = "#8DA0CB",
+  "Stable"       = "#A6A6A6",
+  "Diminution"   = "#D53E4F",
+  "Non classé"   = "grey70"
+)
+
+ggplot(evol_counts,
+       aes(x = reorder(evolution, n),
+           y = n,
+           fill = evolution)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Évolution de l'investissement",
+    x = "",
+    y = "Nombre de réponses"
+  ) +
+  scale_fill_manual(values = cols_evol) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold")
+  )
+
+# diminution ----------------
+
+diminution_dt <- apport_dt2 %>%
+  filter(evolution == "Diminution")
+
+diminution_dt <- diminution_dt %>%
+  mutate(
+    themes_diminution = map(evol_invest_com, function(txt) {
+
+      txt <- str_to_lower(txt)
+
+      detected <- c(
+        if (str_detect(txt, "fatigu|épuis|burn|désinvest|manque d'énergie"))
+          "Fatigue / burn-out",
+
+        if (str_detect(txt, "peu actives|ne se réunit plus"))
+          "Commissions peu actives",
+        
+        if (str_detect(txt, "temps|agenda|activité|soir|disponibil|municipal|possibilité de venir"))
+          "Manque de disponibilité",
+        
+        if (str_detect(txt, "autonomie|long|compliqué"))
+          "Problèmes organisationnels au sein de l'asso",
+
+        if (str_detect(txt, "tension|conflit|relation|interperson|contrôle"))
+          "Tensions relationnelles",
+
+        if (str_detect(txt, "plus assez de personnes|charge|porter|seul"))
+          "Charge collective insuffisante"
+      )
+
+      detected <- unique(detected)
+
+      if (length(detected) == 0) "Autre" else detected
+    })
+  )
+
+themes_long <- diminution_dt %>%
+  unnest(themes_diminution)
+
+theme_counts <- themes_long %>%
+  count(themes_diminution, sort = TRUE)
+
+themes_long <- themes_long %>%
+  mutate(
+    themes_diminution = factor(themes_diminution,
+      levels = c(
+        "Fatigue / burn-out",
+        "Manque de disponibilité",
+        "Problèmes organisationnels au sein de l'asso",
+        "Charge collective insuffisante",
+        "Tensions relationnelles",
+        "Autre"
+      )
+    )
+  )
+
+cols_theme <- c(
+  "Fatigue / burn-out"              = "#D53E4F",
+  "Manque de disponibilité"            = "#FC8D62",
+  "Problèmes organisationnels au sein de l'asso"      = "#8DA0CB",
+  "Charge collective insuffisante"  = "#E78AC3",
+  "Tensions relationnelles"         = "#B2182B",
+  "Autre"                          = "grey70"
+)
+
+ggplot(theme_counts,
+       aes(x = reorder(themes_diminution, n),
+           y = n,
+           fill = themes_diminution)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Pourquoi l'investissement diminue ?",
+    x = "",
+    y = "Nombre de réponses"
+  ) +
+  scale_fill_manual(values = cols_theme) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold")
+  )
+```
+
+
+Extraits choisis : 
+
+- *"Tensions interpersonnelles qui éclaboussent même les personnes qui n'y sont pas mêlées"*
+- *"Le manque de liberté d'action et d'autonomie me freine."*
+- *"Il y a un besoin de contrôle qui fait que tout est si long et compliqué"*
+
+
+```{r echo=FALSE, eval=FALSE, warning=FALSE}
 ## Votre ressenti au sein de l’association a-t-il évolué depuis votre adhésion ?
 
-evol_ressenti = `Q990555. `
+# mise en forme du tableau pour l'histogramme
+evol_ressenti_dt <- as.data.frame(table(dt3$evol_ressenti))
+
+# calcul des frequences
+evol_ressenti_dt$Freq <- as.numeric(as.character(evol_ressenti_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$evol_ressenti <- factor(dt3$evol_ressenti, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+evol_ressenti_dt <- as.data.frame(table(dt3$evol_ressenti))
+
+# Renommer proprement
+colnames(evol_ressenti_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+evol_ressenti_dt$pourcent <- round(evol_ressenti_dt$Freq / sum(evol_ressenti_dt$Freq) * 100)
+
+# Graphique
+ggplot(evol_ressenti_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "evol_ressenti", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(evol_ressenti_dt$Freq), max(evol_ressenti_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
 
 ## Avez-vous rencontré des situations qui vous ont posé problème dans l’association ?
 
-problem = `Q674946.  `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+problem_dt <- as.data.frame(table(dt3$problem))
 
-### Commentaire
+# calcul des frequences
+problem_dt$Freq <- as.numeric(as.character(problem_dt$Freq))
 
-problem_com 
- 
+# Définir toutes les modalités attendues
+modalites <- c("Non", "Oui, une fois", "Oui, plusieurs fois")
+
+# Transformer en facteur avec tous les niveaux
+dt3$problem <- factor(dt3$problem, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+problem_dt <- as.data.frame(table(dt3$problem))
+
+# Renommer proprement
+colnames(problem_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+problem_dt$pourcent <- round(problem_dt$Freq / sum(problem_dt$Freq) * 100)
+
+# Graphique
+ggplot(problem_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "Problème", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  # scale_y_continuous(limits = c(min(problem_dt$Freq), max(problem_dt$Freq + 2))) +
+  expand_limits(y = max(freq_plen_dt$Freq) + 5) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+### Commentaires
+
+```{r echo=FALSE, warning=FALSE}
+problem_com_dt1 <- dt3 %>%
+  filter(!is.na(problem_com)) %>%
+  select(id, problem_com) 
+
+nb_rep_problem_com = length(problem_com_dt1$problem_com)
+```
+
+`r nb_rep_problem_com` commentaires ont été écrits pour cette rubrique.
+
+```{r echo=FALSE, warning=FALSE}
+problem_com_dt2 <- problem_com_dt1 %>%
+  mutate(
+    themes = map(problem_com, function(txt) {
+      
+      detected <- c(
+        if (str_detect(txt, "agressif|houleus|conflit|débat|tension|affect|interpersonnel|irrespect|altercation|ordre|sec"))
+          "Conflit relationnel",
+        
+        if (str_detect(txt, "gasligh"))
+          "Manipulation",
+        
+        if (str_detect(txt, "écouté|légitime|inclusiv|activant|trans|blanche|effac|cis"))
+          "Inclusivité / écoute",
+        
+        if (str_detect(txt, "dirigiste|transparence|conseil|paralyse|collégial|descendant|employé|responsable"))
+          "Gouvernance",
+        
+        if (str_detect(txt, "comprendre|culture|expérience"))
+          "Manque de connaissance / manque d'expérience",
+        
+        if (str_detect(txt, "table"))
+          "Commentaire positif",
+        
+        if (str_detect(txt, "épuisement"))
+          "Surcharge de travail"
+      )
+      
+      detected <- unique(detected)
+      
+      if (length(detected) == 0) "Autre" else detected
+    })
+  )
+
+# ---- 2. Explosion ----
+themes_long <- problem_com_dt2 %>%
+  unnest(themes)
+
+# ---- 3. Comptages ----
+theme_counts <- themes_long %>%
+  count(themes, sort = TRUE)
+
+
+themes_long <- themes_long %>%
+  mutate(
+    themes = factor(themes,
+                    levels = c(
+                      "Conflit relationnel",
+                      "Manipulation",
+                      "Inclusivité / écoute",
+                      "Gouvernance",
+                      "Compréhension / expérience",
+                      "Surcharge de travail",
+                      "Commentaire positif",
+                      "Autre"
+                    ))
+  )
+
+cols_theme <- c(
+  "Conflit relationnel"        = "red",
+  "Manipulation"               = "black",
+  "Inclusivité / écoute"       = "purple",
+  "Gouvernance"                = "darkorange",
+  "Compréhension / expérience" = "skyblue",
+  "Surcharge de travail"       = "brown",
+  "Commentaire positif"        = "green",
+  "Autre"                      = "grey70"
+)
+
+
+ggplot(theme_counts,
+       aes(x = reorder(themes, n),
+           y = n,
+           fill = themes)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Répartition des problèmes par thème",
+    x = "",
+    y = "Nombre de citations"
+  ) +
+  scale_fill_manual(values = cols_theme) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+Extraits choisis : 
+
+- *"Il y a eu un debat sur le tour de pronoms que j'ai trouvé très activant et irrespectueux des personnes trans"*
+- *"La vibe générale du Boucan comme un espace plutot cis et blanc m'ont donné beaucoup moins envie de m'investir"*
+
 ## Qu’est-ce que vous apporte le Boucan personnellement ?
 
-apport = `Q990556. `
+```{r echo=FALSE, warning=FALSE}
+# ---- 1. Données ----
+apport_dt1 <- dt3 %>%
+  filter(!is.na(apport)) %>%
+  select(id, apport)
+
+nb_rep_apport = length(apport_dt1$apport)
+```
+
+`r nb_rep_apport` commentaires ont été écrits pour cette rubrique.
+
+```{r echo=FALSE, warning=FALSE}
+# ---- 1. Détection des thèmes ----
+apport_dt2 <- apport_dt1 %>%
+  mutate(
+    themes = map(apport, function(txt) {
+      
+      txt <- str_to_lower(txt)
+      
+      detected <- c(
+        if (str_detect(txt, "communauté|entre personnes|espace queer|espace|collectivement"))
+          "Communauté / appartenance",
+        
+        if (str_detect(txt, "bien[- ]?être|rassurant|réconfort|soutien|espoir|réponse|joyeuse"))
+          "Soutien / bien-être",
+        
+        if (str_detect(txt, "milit|droits|lutter|fascisme|cause|pas de droite|intersectionnel|défense|valeur"))
+          "Engagement militant",
+        
+        if (str_detect(txt, "rencontre|convivial|sociabilis|ami|moment"))
+          "Rencontres / sociabilité",
+        
+        if (str_detect(txt, "événement|festif"))
+          "Activités / événements",
+        
+        if (str_detect(txt, "impliquer|investi|contribuer|adhésion|agir|action|agir|projet|participer"))
+          "Implication / participation",
+        
+        if (str_detect(txt, "existe|présence"))
+          "Existence de l'association en tant que telle"
+      )
+      
+      detected <- unique(detected)
+      
+      if (length(detected) == 0) "Autre" else detected
+    })
+  )
+
+# ---- 2. Explosion ----
+themes_long <- apport_dt2 %>%
+  unnest(themes)
+
+# ---- 3. Comptages ----
+theme_counts <- themes_long %>%
+  count(themes, sort = TRUE)
+
+# ---- 4. Ordre ----
+themes_long <- themes_long %>%
+  mutate(
+    themes = factor(themes,
+                    levels = c(
+                      "Communauté / appartenance",
+                      "Soutien / bien-être",
+                      "Rencontres / sociabilité",
+                      "Engagement militant",
+                      "Implication / participation",
+                      "Activités / événements",
+                      "Autre"
+                    ))
+  )
+
+# ---- 5. Palette cohérente (positif = vert/bleu) ----
+cols_theme <- c(
+  "Communauté / appartenance"   = "#1B9E77",  # vert
+  "Soutien / bien-être"         = "#66C2A5",  # vert clair
+  "Rencontres / sociabilité"    = "#3288BD",  # bleu
+  "Engagement militant"         = "#D53E4F",  # rouge (engagement / lutte)
+  "Implication / participation" = "#5E4FA2",  # violet
+  "Activités / événements"      = "#FDAE61",  # orange
+  "Autre"                       = "grey70"
+)
+
+# ---- 6. Graphique ----
+ggplot(theme_counts,
+       aes(x = reorder(themes, n),
+           y = n,
+           fill = themes)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Répartition des apports par thème",
+    x = "",
+    y = "Nombre de citations"
+  ) +
+  scale_fill_manual(values = cols_theme) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold")
+  )
+```
 
 ## Avez-vous des choses à ajouter sur votre profil au Boucan ?
 
-ajout_profil = `Q990557. `
+!!!!!!!!!!!!!! commentaire hors sujet, a transférer dans la rubrique approprié !!!!!!!!!!
+
+```{r echo=FALSE, warning=FALSE}
+# ---- 1. Données ----
+# ajout_profil_dt1 <- dt3 %>%
+#   filter(!is.na(ajout_profil)) %>%
+#   select(id, ajout_profil)
+# 
+# nb_rep_ajout_profil = length(ajout_profil_dt1$ajout_profil)
+
+# `r nb_rep_apport` commentaires ont été écrits pour cette rubrique.
+
+```
+
+
+```{r echo=FALSE, warning=FALSE}
+# # ---- 1. Détection des thèmes ----
+# apport_dt2 <- apport_dt1 %>%
+#   mutate(
+#     themes = map(apport, function(txt) {
+#       
+#       txt <- str_to_lower(txt)
+#       
+#       detected <- c(
+#         if (str_detect(txt, "communauté|entre personnes|espace queer|espace|collectivement"))
+#           "Communauté / appartenance",
+#         
+#         if (str_detect(txt, "bien[- ]?être|rassurant|réconfort|soutien|espoir|réponse|joyeuse"))
+#           "Soutien / bien-être",
+#         
+#         if (str_detect(txt, "milit|droits|lutter|fascisme|cause|pas de droite|intersectionnel|défense|valeur"))
+#           "Engagement militant",
+#         
+#         if (str_detect(txt, "rencontre|convivial|sociabilis|ami|moment"))
+#           "Rencontres / sociabilité",
+#         
+#         if (str_detect(txt, "événement|festif"))
+#           "Activités / événements",
+#         
+#         if (str_detect(txt, "impliquer|investi|contribuer|adhésion|agir|action|agir|projet|participer"))
+#           "Implication / participation",
+#         
+#         if (str_detect(txt, "existe|présence"))
+#           "Existence de l'association en tant que telle"
+#       )
+#       
+#       detected <- unique(detected)
+#       
+#       if (length(detected) == 0) "Autre" else detected
+#     })
+#   )
+# 
+# # ---- 2. Explosion ----
+# themes_long <- apport_dt2 %>%
+#   unnest(themes)
+# 
+# # ---- 3. Comptages ----
+# theme_counts <- themes_long %>%
+#   count(themes, sort = TRUE)
+# 
+# # ---- 4. Ordre ----
+# themes_long <- themes_long %>%
+#   mutate(
+#     themes = factor(themes,
+#                     levels = c(
+#                       "Communauté / appartenance",
+#                       "Soutien / bien-être",
+#                       "Rencontres / sociabilité",
+#                       "Engagement militant",
+#                       "Implication / participation",
+#                       "Activités / événements",
+#                       "Autre"
+#                     ))
+#   )
+# 
+# # ---- 5. Palette cohérente (positif = vert/bleu) ----
+# cols_theme <- c(
+#   "Communauté / appartenance"   = "#1B9E77",  # vert
+#   "Soutien / bien-être"         = "#66C2A5",  # vert clair
+#   "Rencontres / sociabilité"    = "#3288BD",  # bleu
+#   "Engagement militant"         = "#D53E4F",  # rouge (engagement / lutte)
+#   "Implication / participation" = "#5E4FA2",  # violet
+#   "Activités / événements"      = "#FDAE61",  # orange
+#   "Autre"                       = "grey70"
+# )
+# 
+# # ---- 6. Graphique ----
+# ggplot(theme_counts,
+#        aes(x = reorder(themes, n),
+#            y = n,
+#            fill = themes)) +
+#   geom_col() +
+#   coord_flip() +
+#   labs(
+#     title = "Répartition des apports par thème",
+#     x = "",
+#     y = "Nombre de citations"
+#   ) +
+#   scale_fill_manual(values = cols_theme) +
+#   theme_minimal(base_size = 12) +
+#   theme(
+#     legend.position = "none",
+#     plot.title = element_text(face = "bold")
+#   )
+```
 
 ## Globalement, comment vous sentez-vous au sein de l'association ?
 
-ressenti = `Q990558. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+ressenti_dt <- as.data.frame(table(dt3$ressenti))
+
+# calcul des frequences
+ressenti_dt$Freq <- as.numeric(as.character(ressenti_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$ressenti <- factor(dt3$ressenti, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+ressenti_dt <- as.data.frame(table(dt3$ressenti))
+
+# Renommer proprement
+colnames(ressenti_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+ressenti_dt$pourcent <- round(ressenti_dt$Freq / sum(ressenti_dt$Freq) * 100)
+
+# Graphique
+ggplot(ressenti_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "Ressenti", y = "Nombre de personnes",
+       title = "Globalement, comment vous sentez-vous au sein de l'association ?") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(ressenti_dt$Freq), max(ressenti_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+
 
 ## Vous sentez-vous libre d’exprimer vos opinions ?
 
-expression = `Q860601. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+expression_dt <- as.data.frame(table(dt3$expression))
+
+# calcul des frequences
+expression_dt$Freq <- as.numeric(as.character(expression_dt$Freq))
+
+# Calcul des pourcentages
+expression_dt$pourcent <- round(expression_dt$Freq / sum(expression_dt$Freq) * 100)
+
+# Graphique
+ggplot(expression_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(pourcent, 1), " %")),
+            vjust = 2) +
+  labs(x = "expression", y = "Nombre de personnes",
+       title = "") +
+  scale_fill_manual(values = rainbow(length(expression_dt$Var1))) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+```
 
 ## Vous sentez-vous écouté.e au Boucan ?
 
-ecoute = `Q625295. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+inclusion_dt <- as.data.frame(table(dt3$inclusion))
+
+# calcul des frequences
+inclusion_dt$Freq <- as.numeric(as.character(inclusion_dt$Freq))
+
+# Calcul des pourcentages
+inclusion_dt$pourcent <- round(inclusion_dt$Freq / sum(inclusion_dt$Freq) * 100)
+
+# Graphique
+ggplot(inclusion_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(pourcent, 1), " %")),
+            vjust = 2) +
+  labs(x = "inclusion", y = "Nombre de personnes",
+       title = "") +
+  scale_fill_manual(values = rainbow(length(inclusion_dt$Var1))) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+```
 
 ## Vous sentez-vous facilement inclus.e au Boucan ?
 
-inclusion = 
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+ecoute_dt <- as.data.frame(table(dt3$ecoute))
+
+# calcul des frequences
+ecoute_dt$Freq <- as.numeric(as.character(ecoute_dt$Freq))
+
+# Calcul des pourcentages
+ecoute_dt$pourcent <- round(ecoute_dt$Freq / sum(ecoute_dt$Freq) * 100)
+
+# Graphique
+ggplot(ecoute_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(pourcent, 1), " %")),
+            vjust = 2) +
+  labs(x = "ecoute", y = "Nombre de personnes",
+       title = "") +
+  scale_fill_manual(values = rainbow(length(ecoute_dt$Var1))) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+```
 
 ## Avez-vous le sentiment d’avoir des interactions globalement bienveillantes ?
 
-bienveillance = `Q630865. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+bienveillance_dt <- as.data.frame(table(dt3$bienveillance))
+
+# calcul des frequences
+bienveillance_dt$Freq <- as.numeric(as.character(bienveillance_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$bienveillance <- factor(dt3$bienveillance, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+bienveillance_dt <- as.data.frame(table(dt3$bienveillance))
+
+# Renommer proprement
+colnames(bienveillance_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+bienveillance_dt$pourcent <- round(bienveillance_dt$Freq / sum(bienveillance_dt$Freq) * 100)
+
+# Graphique
+ggplot(bienveillance_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "bienveillance", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(bienveillance_dt$Freq), 
+                                max(bienveillance_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
 
 ## Avez-vous des choses à ajouter sur votre bien-être au Boucan ?
 
-bienetre = `Q990559. `
+```{r eval=FALSE, echo=FALSE}
+# # ===============================
+# # 1) Préparation des données
+# # ===============================
+# df <- dt3 %>%
+#   filter(!is.na(bienetre_com)) %>%
+#   mutate(text = str_to_lower(bienetre_com))
+# 
+# # ===============================
+# # 2) Tokenisation (mots)
+# # ===============================
+# tidy_df <- df %>%
+#   unnest_tokens(word, text)
+# 
+# # ===============================
+# # 3) Nettoyage (stopwords + bruit)
+# # ===============================
+# data("stop_words")
+# 
+# custom_stopwords <- tibble(
+#   word = c("association", "personnes", "cela", "comme", "très")
+# )
+# 
+# tidy_df <- tidy_df %>%
+#   anti_join(stop_words, by = "word") %>%
+#   anti_join(custom_stopwords, by = "word") %>%
+#   filter(str_length(word) > 2)
+# 
+# # ===============================
+# # 4) Fréquence des mots
+# # ===============================
+# word_counts <- tidy_df %>%
+#   count(word, sort = TRUE)
+# 
+# # Top 10 mots
+# top_words <- word_counts %>%
+#   slice_max(n, n = 10)
+# 
+# # Graphique ggplot
+# ggplot(top_words, aes(x = reorder(word, n), y = n)) +
+#   geom_col(fill = "steelblue") +
+#   coord_flip() +
+#   labs(
+#     title = "Mots les plus fréquents",
+#     x = "",
+#     y = "Fréquence"
+#   ) +
+#   theme_minimal()
+# 
+# # ===============================
+# # 5) Nuage de mots
+# # ===============================
+# set.seed(123)
+# 
+# wordcloud(
+#   words = word_counts$word,
+#   freq = word_counts$n,
+#   max.words = 50,
+#   colors = RColorBrewer::brewer.pal(8, "Dark2")
+# )
+# 
+# # ===============================
+# # 6) Analyse de sentiments
+# # ===============================
+# sentiments <- get_sentiments("nrc")
+# 
+# sentiment_counts <- tidy_df %>%
+#   inner_join(sentiments, by = "word") %>%
+#   count(sentiment, sort = TRUE)
+# 
+# # Graphique sentiments
+# ggplot(sentiment_counts, aes(x = reorder(sentiment, n), y = n)) +
+#   geom_col(fill = "darkred") +
+#   coord_flip() +
+#   labs(
+#     title = "Répartition des sentiments",
+#     x = "",
+#     y = "Nombre de mots"
+#   ) +
+#   theme_minimal()
+# 
+# # ===============================
+# # 7) Score simple positif / négatif
+# # ===============================
+# sentiment_simple <- tidy_df %>%
+#   inner_join(get_sentiments("bing"), by = "word") %>%
+#   count(sentiment)
+# 
+# ggplot(sentiment_simple, aes(x = sentiment, y = n, fill = sentiment)) +
+#   geom_col(show.legend = FALSE) +
+#   labs(
+#     title = "Balance positif / négatif",
+#     x = "",
+#     y = "Nombre de mots"
+#   ) +
+#   theme_minimal()
+# 
+# # ===============================
+# # 8) Catégorisation manuelle (thèmes)
+# # ===============================
+# df_theme <- df %>%
+#   mutate(theme = case_when(
+#     str_detect(text, "tension|agressivit|conflit|hostilit") ~ "Conflit",
+#     str_detect(text, "écoute|soin|bienveillance|apprécie") ~ "Positif",
+#     str_detect(text, "difficile|blessant") ~ "Ressenti négatif",
+#     TRUE ~ "Autre"
+#   ))
+# 
+# theme_counts <- df_theme %>%
+#   count(theme, sort = TRUE)
+# 
+# # Graphique thèmes
+# ggplot(theme_counts, aes(x = reorder(theme, n), y = n)) +
+#   geom_col(fill = "darkgreen") +
+#   coord_flip() +
+#   labs(
+#     title = "Répartition des thèmes",
+#     x = "",
+#     y = "Nombre de réponses"
+#   ) +
+#   theme_minimal()
+# 
+# # ===============================
+# # 9) BONUS : bigrams (expressions)
+# # ===============================
+# bigrams <- df %>%
+#   unnest_tokens(bigram, text, token = "ngrams", n = 2)
+# 
+# bigrams_clean <- bigrams %>%
+#   separate(bigram, into = c("word1", "word2"), sep = " ") %>%
+#   filter(!word1 %in% stop_words$word,
+#          !word2 %in% stop_words$word)
+# 
+# bigram_counts <- bigrams_clean %>%
+#   count(word1, word2, sort = TRUE)
+# 
+# top_bigrams <- bigram_counts %>%
+#   unite(bigram, word1, word2, sep = " ") %>%
+#   slice_max(n, n = 10)
+# 
+# ggplot(top_bigrams, aes(x = reorder(bigram, n), y = n)) +
+#   geom_col(fill = "purple") +
+#   coord_flip() +
+#   labs(
+#     title = "Expressions fréquentes",
+#     x = "",
+#     y = "Fréquence"
+#   ) +
+#   theme_minimal()
+```
+
+```{r echo=FALSE, warning=FALSE}
+be_dt1 <- dt3 %>%
+  filter(!is.na(bienetre_com)) %>%
+  select(id, bienetre_com) %>% 
+  filter(!bienetre_com=="Non")
+
+nb_rep_be = length(be_dt1$bienetre_com)
+```
+
+`r nb_rep_be` commentaires ont été écrits pour cette rubrique.
+
+```{r echo=FALSE, warning=FALSE}
+# ---- 1. Création des variables ----
+be_dt2 <- be_dt1 %>%
+  mutate(
+    be_positif_negatif = case_when(
+      str_detect(bienetre_com, "écoute|soin|bienveillance|apprécie|merci") ~ "Positif",
+      str_detect(bienetre_com, "dommage|difficile|blessant|tension|agressivit|conflit|hostilit|critiqu|droite|dégrad") ~ "Négatif",
+      TRUE ~ "Neutre"
+    ),
+    be_detail = case_when(
+      str_detect(bienetre_com, "tension|agressivit|conflit|hostilit|critiqu") ~ "Conflit",
+      str_detect(bienetre_com, "écoute|soin|bienveillance|apprécie|merci") ~ "Positif",
+      str_detect(bienetre_com, "difficile|blessant|dégrad") ~ "Négatif",
+      TRUE ~ "Autre"
+    )
+  )
+
+# ---- 2. Forcer un ordre logique ----
+be_dt2 <- be_dt2 %>%
+  mutate(
+    be_positif_negatif = factor(be_positif_negatif,
+                                levels = c("Positif", "Neutre", "Négatif")),
+    be_detail = factor(be_detail,
+                       levels = c("Positif", "Conflit", "Négatif", "Autre"))
+  )
+
+# ---- 3. Comptages ----
+be_positif_negatif_counts <- be_dt2 %>%
+  count(be_positif_negatif, sort = TRUE)
+
+be_detail_counts <- be_dt2 %>%
+  count(be_detail, sort = TRUE)
+
+# ---- 4. Palettes de couleurs ----
+
+# Sentiment (couleurs métier claires)
+cols_sentiment <- c(
+  "Positif" = "green",
+  "Neutre"  = "grey70",
+  "Négatif" = "red"
+)
+
+# Thèmes (rainbow contrôlé + overrides)
+base_cols <- rainbow(length(levels(be_dt2$be_detail)))
+
+cols_detail <- setNames(base_cols, levels(be_dt2$be_detail))
+
+# Override pour garder du sens
+cols_detail["Positif"] <- "green"
+cols_detail["Conflit"] <- "red"
+cols_detail["Négatif"] <- "orange"
+cols_detail["Autre"]   <- "grey70"
+
+# ---- 5. Graphique sentiment ----
+ggplot(be_positif_negatif_counts,
+       aes(x = reorder(be_positif_negatif, n),
+           y = n,
+           fill = be_positif_negatif)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Répartition en sentiment (positif, neutre, négatif)",
+    x = "",
+    y = "Nombre de réponses"
+  ) +
+  scale_fill_manual(values = cols_sentiment) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# ---- 6. Graphique thèmes ----
+ggplot(be_detail_counts,
+       aes(x = reorder(be_detail, n),
+           y = n,
+           fill = be_detail)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Répartition en thèmes (positif, négatif, conflit, autre)",
+    x = "",
+    y = "Nombre de réponses"
+  ) +
+  scale_fill_manual(values = cols_detail) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
 
 ## Comment avez-vous trouvé l’accueil au Boucan ?
 
-accueil = `Q990560. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+accueil_dt <- as.data.frame(table(dt3$accueil))
 
-### Commentaire 
+# calcul des frequences
+accueil_dt$Freq <- as.numeric(as.character(accueil_dt$Freq))
 
-accueil_com = 
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$accueil <- factor(dt3$accueil, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+accueil_dt <- as.data.frame(table(dt3$accueil))
+
+# Renommer proprement
+colnames(accueil_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+accueil_dt$pourcent <- round(accueil_dt$Freq / sum(accueil_dt$Freq) * 100)
+
+# Graphique
+ggplot(accueil_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "accueil", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(accueil_dt$Freq), 
+                                max(accueil_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+### Commentaires 
+
+```{r echo=FALSE, warning=FALSE}
+accueil_com_dt1 <- dt3 %>%
+  filter(!is.na(accueil_com)) %>%
+  select(id, accueil_com) 
+
+nb_rep_accueil_com= length(accueil_com_dt1$accueil_com)
+```
+
+`r nb_rep_accueil_com` commentaires ont été écrits pour cette rubrique.
+
+```{r echo=FALSE, warning=FALSE}
+# ---- 1. Catégorisation des verbatims ----
+accueil_com_dt2 <- accueil_com_dt1 %>%
+  mutate(
+    themes = map(accueil_com, function(txt) {
+      
+      detected <- c(
+        
+        if (str_detect(txt, "accueil|livret"))
+          "Pas de procédure d'acceuil",
+        
+        if (str_detect(txt, "comprendre|fonctionnement|organisation|fonctionner"))
+          "Compréhension de l'organisation",
+        
+        if (str_detect(txt, "seul|isolé|difficile|compliqué|arrivée|nouveau|intégration|impersonnel|relation|contact|personne|rencontré"))
+          "Isolement des nouvelleaux / Manque de lien social",
+        
+        if (str_detect(txt, "bon accueil|humain|bien|positif"))
+          "Accueil positif"
+      )
+      
+      detected <- unique(detected)
+      
+      if (length(detected) == 0) "Autre" else detected
+    })
+  )
+
+# ---- 2. Explosion des thèmes ----
+themes_long <- accueil_com_dt2 %>%
+  unnest(themes)
+
+# ---- 3. Comptage ----
+theme_counts <- themes_long %>%
+  count(themes, sort = TRUE)
+
+# ---- 4. Ordre des catégories ----
+themes_long <- themes_long %>%
+  mutate(
+    themes = factor(themes,
+      levels = c(
+        "Pas de procédure d'acceuil",
+        "Compréhension de l'organisation",
+        "Isolement des nouvelleaux / Manque de lien social",
+        "Accueil positif",
+        "Autre"
+      )
+    )
+  )
+
+# ---- 5. Couleurs ----
+cols_theme <- c(
+  "Pas de procédure d'acceuil"                = "#1f77b4",  # bleu
+  "Compréhension de l'organisation"      = "#ff7f0e",  # orange
+  "Isolement des nouvelleaux / Manque de lien social" = "#9467bd",  # violet
+  "Accueil positif"                      = "#2ca02c",  # vert
+  "Autre"                               = "grey70"
+)
+
+# ---- 6. Graphique ----
+ggplot(theme_counts,
+       aes(x = reorder(themes, n),
+           y = n,
+           fill = themes)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Répartition des retours sur l’accueil",
+    x = "",
+    y = "Nombre de citations"
+  ) +
+  scale_fill_manual(values = cols_theme) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+Extraits choisis : 
+
+- *"Il n'y a pas de moments d’accueil"*
+- *"Il n'a pas de livret d’accueil"*
+- *"Vous pourriez peut-être aller vers les nouveaux membres"*
+- *"C'est assez impersonnel comme relation"*
 
 ## Avez-vous une connaissance suffisante du fonctionnement du Boucan pour pouvoir facilement vous y impliquer, prendre des décisions, des responsabilités ?
 
-connaissance = `Q990561. 
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+connaissance_dt <- as.data.frame(table(dt3$connaissance))
 
-### Commentaire 
+# calcul des frequences
+connaissance_dt$Freq <- as.numeric(as.character(connaissance_dt$Freq))
 
-connaissance_com = 
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$connaissance <- factor(dt3$connaissance, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+connaissance_dt <- as.data.frame(table(dt3$connaissance))
+
+# Renommer proprement
+colnames(connaissance_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+connaissance_dt$pourcent <- round(connaissance_dt$Freq / sum(connaissance_dt$Freq) * 100)
+
+# Graphique
+ggplot(connaissance_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "connaissance", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(connaissance_dt$Freq), 
+                                max(connaissance_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+### Commentaires 
+
+```{r echo=FALSE, warning=FALSE}
+connaissance_com_dt1 <- dt3 %>%
+  filter(!is.na(connaissance_com)) %>%
+  select(id, connaissance_com) 
+
+nb_rep_connaissance_com= length(connaissance_com_dt1$connaissance_com)
+```
+
+`r nb_rep_connaissance_com` commentaires ont été écrits pour cette rubrique.
+
+```{r echo=FALSE, warning=FALSE}
+# ---- 1. Catégorisation des verbatims ----
+connaissance_com_dt2 <- connaissance_com_dt1 %>%
+  mutate(
+    themes = map(connaissance_com, function(txt) {
+      
+      detected <- c(
+        
+        if (str_detect(txt, "comprendre|clair|comprends|compréhension|acquis|fonctionnement"))
+          "Compréhension du fonctionnement ok",
+        
+        if (str_detect(txt, "rôle|responsabilit|implication|s'impliquer"))
+          "Pas assez de clarté des rôles",
+        
+        if (str_detect(txt, "conseil|collégial"))
+          "Pas assez de clarté fonctionnement CC",
+        
+        if (str_detect(txt, "Non|lacune|pas très clair|manque|doute"))
+          "Manque de connaissance",
+        
+        if (str_detect(txt, "former|formation|documents|accueil|plénière"))
+          "Apprentissage en cours",
+        
+        if (str_detect(txt, "légitime|queer|responsabilités|ne me sens pas"))
+          "Sentiment de manque de légitimité",
+        
+        if (str_detect(txt, "saurais quoi faire|impliquer|possible|acquis"))
+          "Capacité d’implication identifiée"
+      )
+      
+      detected <- unique(detected)
+      
+      if (length(detected) == 0) "Autre" else detected
+    })
+  )
+
+# ---- 2. Explosion des thèmes ----
+themes_long <- connaissance_com_dt2 %>%
+  unnest(themes)
+
+# ---- 3. Comptage ----
+theme_counts <- themes_long %>%
+  count(themes, sort = TRUE)
+
+# ---- 4. Ordre des catégories ----
+themes_long <- themes_long %>%
+  mutate(
+    themes = factor(themes,
+      levels = c(
+        "Compréhension du fonctionnement ok",
+"Pas assez de clarté des rôles",
+"Manque de connaissance",
+        "Apprentissage via ressources",
+        "Capacité d’implication identifiée",
+        "Sentiment de légitimité",
+        "Pas assez de clarté fonctionnement du CC",
+"Apprentissage en cours",
+        "Autre"
+      )
+    )
+  )
+
+# ---- 5. Couleurs ----
+cols_theme <- c(
+  "Compréhension du fonctionnement ok"   = "darkgreen",  # bleu
+  "Clarté des rôles / gouvernance"    = "#ff7f0e",  # orange
+  "Manque de connaissance"            = "#d62728",  # rouge
+  "Apprentissage via ressources"      = "#2ca02c",  # vert
+  "Capacité d’implication identifiée" = "green",  # violet
+  "Sentiment de manque de légitimité"           = "#8c564b",  # brun
+  "Pas assez de clarté fonctionnement du CC" = "yellow",
+  "Pas assez de clarté des rôles" = "orange",
+  "Apprentissage en cours" = "lightgreen",
+  "Autre"                            = "grey70"
+)
+
+# ---- 6. Graphique ----
+ggplot(theme_counts,
+       aes(x = reorder(themes, n),
+           y = n,
+           fill = themes)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Répartition des retours sur la connaissance du Boucan",
+    x = "",
+    y = "Nombre de citations"
+  ) +
+  scale_fill_manual(values = cols_theme) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
+
+Extrait choisi : 
+
+- *"N'étant pas queer, je ne me sens pas légitime pour prendre des responsabilités. (Mais) Cela ne gêne pas l'implication"*
 
 ## Trouvez-vous les réunions plénières fonctionnelles et efficaces ?
 
-plen_fonc = `Q483205. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+plen_fonc_dt <- as.data.frame(table(dt3$plen_fonc))
 
+# calcul des frequences
+plen_fonc_dt$Freq <- as.numeric(as.character(plen_fonc_dt$Freq))
 
-### Commentaire
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
 
-plen_fonc_com = 
+# Transformer en facteur avec tous les niveaux
+dt3$plen_fonc <- factor(dt3$plen_fonc, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+plen_fonc_dt <- as.data.frame(table(dt3$plen_fonc))
+
+# Renommer proprement
+colnames(plen_fonc_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+plen_fonc_dt$pourcent <- round(plen_fonc_dt$Freq / sum(plen_fonc_dt$Freq) * 100)
+
+# Graphique
+ggplot(plen_fonc_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "Efficacité de fonctionnement des plénière", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(plen_fonc_dt$Freq), 
+                                max(plen_fonc_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+### Commentaires
+
+```{r echo=FALSE, warning=FALSE}
+plen_fonc_com_dt1 <- dt3 %>%
+  filter(!is.na(plen_fonc_com)) %>%
+  select(id, plen_fonc_com) 
+
+nb_rep_plen_fonc_com = length(plen_fonc_com_dt1$plen_fonc_com)
+```
+
+`r nb_rep_plen_fonc_com` commentaires ont été écrits pour cette rubrique.
+
+```{r echo=FALSE, warning=FALSE}
+plen_fonc_com_dt2 <- plen_fonc_com_dt1 %>%
+  mutate(
+    themes = map(plen_fonc_com, function(txt) {
+      
+      detected <- c(
+        
+        if (str_detect(txt, "gouvernance|décision|réflexion|expression"))
+          "Rôle des plénières (gouvernance)",
+        
+        if (str_detect(txt, "vote|élire|anonym"))
+          "Problèmes de vote / démocratie interne",
+        
+        if (str_detect(txt, "longues|ennuyeuses|saturantes"))
+          "Fatigue / lourdeur des plénières",
+        
+        if (str_detect(txt, "déborder|créneau|temps"))
+          "Problèmes d'organisation / timing",
+        
+        if (str_detect(txt, "neuro|care|repos|accessibilité"))
+          "Accessibilité et inclusion"
+      )
+      
+      detected <- unique(detected)
+      
+      if (length(detected) == 0) "Autre" else detected
+    })
+  )
+
+themes_long <- themes_long %>%
+  mutate(
+    themes = factor(themes,
+      levels = c(
+        "Rôle des plénières (gouvernance)",
+        "Problèmes de vote / démocratie interne",
+        "Fatigue / lourdeur des plénières",
+        "Problèmes d'organisation / timing",
+        "Accessibilité et inclusion",
+        "Autre"
+      )
+    )
+  )
+
+# ---- 2. Explosion des thèmes ----
+themes_long <- plen_fonc_com_dt2 %>%
+  unnest(themes)
+
+# ---- 3. Comptage ----
+theme_counts <- themes_long %>%
+  count(themes, sort = TRUE)
+
+# ---- 4. Ordre des catégories ----
+themes_long <- themes_long %>%
+  mutate(
+    themes = factor(themes,
+      levels = c(
+        "Pas de procédure d'acceuil",
+        "Compréhension de l'organisation",
+        "Isolement des nouvelleaux / Manque de lien social",
+        "Accueil positif",
+        "Autre"
+      )
+    )
+  )
+
+# ---- 5. Couleurs ----
+cols_theme <- c(
+  "Rôle des plénières (gouvernance)" = "#1f77b4",
+  "Problèmes de vote / démocratie interne" = "#d62728",
+  "Fatigue / lourdeur des plénières" = "#9467bd",
+  "Problèmes d'organisation / timing" = "#ff7f0e",
+  "Accessibilité et inclusion" = "#2ca02c",
+  "Autre" = "grey70"
+)
+
+# ---- 6. Graphique ----
+ggplot(theme_counts,
+       aes(x = reorder(themes, n),
+           y = n,
+           fill = themes)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+  title = "Répartition des retours sur les plénières",
+  x = "",
+  y = "Nombre de citations"
+) +
+  scale_fill_manual(values = cols_theme) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+Extraits choisis : 
+
+- *"C'est très bien les plénières comme outils de gouvernance, lieu d'expression, de réflexion et de prise de décision"*
+- *"Les améliorations récentes sont chouettes (parole uniquement aux commissions présentes, une personne garante du temps"*
+- *"Le système de vote pour élire les personnes au CC n'est pas fonctionnel, car pas anonymes, sur une seule liste, pas sur chaque personne en particulier... donc très difficile de "s'opposer à l'élection d'une personne si besoin"*
+- *"Très saturantes pour les personnes neuroA"*
+- *"Manque de culture du care"*
+- *"Il faudrait essayer de les coupler avec une réunion de ""travail"" sur un thème ( exemples: militantisme, culture, solidarité, santé...etc) ou réunion de travail d'une commission"*
+- *"Horriblement longues et ennuyeuses"*
+- *"Tout y est décidé alors que pleins de gens ne peuvent pas y aller"*
 
 ## Trouvez-vous les commissions globalement fonctionnelles et efficaces ?
 
-commission_fonc = `Q617401. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+commission_fonc_dt <- as.data.frame(table(dt3$commission_fonc))
 
-## Q595178. Pour les commissions : trouvez-vous fonctionnel le lien avec le Conseil Collégial et les réunions plénières ?
+# calcul des frequences
+commission_fonc_dt$Freq <- as.numeric(as.character(commission_fonc_dt$Freq))
 
-lien_commission_cc_plen = `
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$commission_fonc <- factor(dt3$commission_fonc, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+commission_fonc_dt <- as.data.frame(table(dt3$commission_fonc))
+
+# Renommer proprement
+colnames(commission_fonc_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+commission_fonc_dt$pourcent <- round(commission_fonc_dt$Freq / sum(commission_fonc_dt$Freq) * 100)
+
+# Graphique
+ggplot(commission_fonc_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "commission_fonc", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(commission_fonc_dt$Freq), 
+                                max(commission_fonc_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+### Commentaires 
+
+```{r echo=FALSE, warning=FALSE}
+commission_fonc_com_dt1 <- dt3 %>%
+  filter(!is.na(commission_fonc_com)) %>%
+  select(id, commission_fonc_com) %>% 
+  filter(!id == 24)
+
+nb_rep_commission_fonc_com = length(commission_fonc_com_dt1$commission_fonc_com)
+```
+
+`r nb_rep_commission_fonc_com` commentaires ont été écrits pour cette rubrique.
+
+```{r echo=FALSE, warning=FALSE}
+# ---- 1. Catégorisation des verbatims ----
+commission_fonc_com_dt2 <- commission_fonc_com_dt1 %>%
+  mutate(
+    themes = map(commission_fonc_com, function(txt) {
+      
+      txt <- str_to_lower(txt)
+      
+      detected <- c(
+        
+        if (str_detect(txt, "trop de commission|trop de personne|dilu"))
+          "Répartition des ressources / taille des commissions",
+        
+        if (str_detect(txt, "investir|investissement|bénévole|s'investir|suivre|intérêt sans forcément"))
+          "Manque d'engagement",
+        
+        if (str_detect(txt, "complexe|compliqu|pas quel bout|fonctionnement"))
+          "Manque de clarté / complexité",
+        
+        if (str_detect(txt, "rôle|référent|conseil collégial|interaction"))
+          "Flou des rôles et responsabilités",
+        
+        if (str_detect(txt, "telegram|échanges|communication"))
+          "Problèmes de communication sur Telegram"
+      )
+      
+      detected <- unique(detected)
+      
+      if (length(detected) == 0) "Autre" else detected
+    })
+  )
+
+# ---- 2. Explosion des thèmes ----
+themes_long <- commission_fonc_com_dt2 %>%
+  unnest(themes)
+
+# ---- 3. Comptage ----
+theme_counts <- themes_long %>%
+  count(themes, sort = TRUE)
+
+# ---- 4. Ordre des catégories ----
+themes_long <- themes_long %>%
+  mutate(
+    themes = factor(themes,
+      levels = c(
+        "Manque de clarté / complexité",
+        "Flou des rôles et responsabilités",
+        "Manque d'engagement",
+        "Répartition des ressources / taille des commissions",
+        "Problèmes de communication sur Telegram",
+        "Participation flexible / implication partielle",
+        "Autre"
+      )
+    )
+  )
+
+# ---- 5. Appliquer le même ordre au tableau de comptage ----
+theme_counts <- theme_counts %>%
+  mutate(
+    themes = factor(themes,
+      levels = levels(themes_long$themes)
+    )
+  )
+
+# ---- 6. Couleurs ----
+cols_theme <- c(
+  "Manque de clarté / complexité" = "#1f77b4",
+  "Flou des rôles et responsabilités" = "#ff7f0e",
+  "Manque d'engagement" = "#d62728",
+  "Répartition des ressources / taille des commissions" = "#9467bd",
+  "Problèmes de communication sur Telegram" = "#2ca02c",
+  "Participation flexible / implication partielle" = "#8c564b",
+  "Autre" = "grey70"
+)
+
+# ---- 7. Graphique ----
+ggplot(theme_counts,
+       aes(x = reorder(themes, n),
+           y = n,
+           fill = themes)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Répartition des retours sur le fonctionnement des commissions",
+    x = "",
+    y = "Nombre de citations"
+  ) +
+  scale_fill_manual(values = cols_theme) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
+
+Extraits choisis : 
+
+- *"Trop de commission, ou trop de personne par commission, donc les forces vives sont diluées"*
+- *"Indiquer si on sera bénévole (rôle actif) ou simplement là pour être tenu au courant de ce qui se passe dans la commission (rôle passif)"*
+
+## Pour les commissions : trouvez-vous fonctionnel le lien avec le Conseil Collégial et les réunions plénières ?
+
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+lien_commission_cc_plen_dt <- as.data.frame(table(dt3$lien_commission_cc_plen))
+
+# calcul des frequences
+lien_commission_cc_plen_dt$Freq <- as.numeric(as.character(lien_commission_cc_plen_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$lien_commission_cc_plen <- factor(dt3$lien_commission_cc_plen, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+lien_commission_cc_plen_dt <- as.data.frame(table(dt3$lien_commission_cc_plen))
+
+# Renommer proprement
+colnames(lien_commission_cc_plen_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+lien_commission_cc_plen_dt$pourcent <- round(lien_commission_cc_plen_dt$Freq / sum(lien_commission_cc_plen_dt$Freq) * 100)
+
+# Graphique
+ggplot(lien_commission_cc_plen_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "liens entre les commissions et le CC", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(lien_commission_cc_plen_dt$Freq), 
+                                max(lien_commission_cc_plen_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
 
 ## Pour les commissions : trouvez-vous fonctionnel le rôle attribué aux référent.e.s de commissions ?
 
-ref_commision_fonc = `Q141881. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+ref_commision_fonc_dt <- as.data.frame(table(dt3$ref_commision_fonc))
+
+# calcul des frequences
+ref_commision_fonc_dt$Freq <- as.numeric(as.character(ref_commision_fonc_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$ref_commision_fonc <- factor(dt3$ref_commision_fonc, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+ref_commision_fonc_dt <- as.data.frame(table(dt3$ref_commision_fonc))
+
+# Renommer proprement
+colnames(ref_commision_fonc_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+ref_commision_fonc_dt$pourcent <- round(ref_commision_fonc_dt$Freq / sum(ref_commision_fonc_dt$Freq) * 100)
+
+# Graphique
+ggplot(ref_commision_fonc_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "Rôle attribué au référent des commissions", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(ref_commision_fonc_dt$Freq), 
+                                max(ref_commision_fonc_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
 
 ## Pour les commissions : trouvez-vous fonctionnelle l'organisation au sein des commissions ?
 
-orga_dans_commission_fonc = `Q915400. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+orga_dans_commission_fonc_dt <- as.data.frame(table(dt3$orga_dans_commission_fonc))
 
-### Commentaire
+# calcul des frequences
+orga_dans_commission_fonc_dt$Freq <- as.numeric(as.character(orga_dans_commission_fonc_dt$Freq))
 
-orga_dans_commission_fonc_com = 
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$orga_dans_commission_fonc <- factor(dt3$orga_dans_commission_fonc, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+orga_dans_commission_fonc_dt <- as.data.frame(table(dt3$orga_dans_commission_fonc))
+
+# Renommer proprement
+colnames(orga_dans_commission_fonc_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+orga_dans_commission_fonc_dt$pourcent <- round(orga_dans_commission_fonc_dt$Freq / sum(orga_dans_commission_fonc_dt$Freq) * 100)
+
+# Graphique
+ggplot(orga_dans_commission_fonc_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "Organisation au sein des commissions", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(orga_dans_commission_fonc_dt$Freq), 
+                                max(orga_dans_commission_fonc_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+### Commentaires
+
+```{r echo=FALSE, warning=FALSE}
+orga_dans_commission_fonc_com_dt1 <- dt3 %>%
+  filter(!is.na(orga_dans_commission_fonc_com)) %>%
+  select(id, orga_dans_commission_fonc_com) %>% 
+  filter(!id == 39)
+
+nb_rep_orga_dans_commission_fonc_com = length(orga_dans_commission_fonc_com_dt1$orga_dans_commission_fonc_com)
+```
+
+`r nb_rep_orga_dans_commission_fonc_com` commentaires ont été écrits pour cette rubrique.
+
+```{r echo=FALSE, warning=FALSE}
+# ---- 1. Catégorisation des verbatims ----
+orga_dans_commission_fonc_com_dt2 <- orga_dans_commission_fonc_com_dt1 %>%
+  mutate(
+    themes = map(orga_dans_commission_fonc_com, function(txt) {
+      
+      txt <- str_to_lower(txt)
+      
+      detected <- c(
+        
+        if (str_detect(txt, "sommeil|inactive|n'aboutissent|rien"))
+          "Commissions inactives / peu productives",
+        
+        if (str_detect(txt, "lead|prendre en main|personne ne le fait"))
+          "Manque de leadership",
+        
+        if (str_detect(txt, "dépend|certaines|d'autres"))
+          "Fonctionnement hétérogène selon les commissions",
+        
+        if (str_detect(txt, "recul|juger"))
+          "Manque de recul"
+      )
+      
+      detected <- unique(detected)
+      
+      if (length(detected) == 0) "Autre" else detected
+    })
+  )
+
+# ---- 2. Explosion des thèmes ----
+themes_long <- orga_dans_commission_fonc_com_dt2 %>%
+  unnest(themes)
+
+# ---- 3. Comptage ----
+theme_counts <- themes_long %>%
+  count(themes, sort = TRUE)
+
+# ---- 4. Ordre des catégories ----
+themes_long <- themes_long %>%
+  mutate(
+    themes = factor(themes,
+      levels = c(
+        "Commissions inactives / peu productives",
+        "Manque de leadership",
+        "Fonctionnement hétérogène selon les commissions",
+        "Manque de recul",
+        "Autre"
+      )
+    )
+  )
+
+# ---- 5. Appliquer ordre au comptage ----
+theme_counts <- theme_counts %>%
+  mutate(
+    themes = factor(themes,
+      levels = levels(themes_long$themes)
+    )
+  )
+
+# ---- 6. Couleurs ----
+cols_theme <- c(
+  "Commissions inactives / peu productives" = "#d62728",
+  "Manque de leadership" = "#ff7f0e",
+  "Fonctionnement hétérogène selon les commissions" = "#1f77b4",
+  "Manque de recul" = "#9467bd",
+  "Autre" = "grey70"
+)
+
+# ---- 7. Graphique ----
+ggplot(theme_counts,
+       aes(x = reorder(themes, n),
+           y = n,
+           fill = themes)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Organisation interne dabs les commissions",
+    x = "",
+    y = "Nombre de citations"
+  ) +
+  scale_fill_manual(values = cols_theme) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+Extraits choisis : 
+
+- *"Cela dépends des commissions, globalement, je trouve que lorsqu'une personne prends le lead, tout en faisant valider ou tenant au courant pour concertation les personnes dans la commission ça marche bien"*
+- *"si on ne prend pas les choses en main, personne ne le fait"*
 
 ## Pour les commissions : avez-vous une connaissance suffisante d’à quel point les personnes présentes souhaitent s’investir ?
 
-connaissance_envie_invest_dans_com = `Q253829. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+connaissance_envie_invest_dans_com_dt <- as.data.frame(table(dt3$connaissance_envie_invest_dans_com))
 
-## Vous pouvez vous exprimer ici sur le fonctionnement des commissions si vous le souhaitez`
+# calcul des frequences
+connaissance_envie_invest_dans_com_dt$Freq <- as.numeric(as.character(connaissance_envie_invest_dans_com_dt$Freq))
 
-commission_fonc_com = `Q990563. 
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$connaissance_envie_invest_dans_com <- factor(dt3$connaissance_envie_invest_dans_com, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+connaissance_envie_invest_dans_com_dt <- as.data.frame(table(dt3$connaissance_envie_invest_dans_com))
+
+# Renommer proprement
+colnames(connaissance_envie_invest_dans_com_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+connaissance_envie_invest_dans_com_dt$pourcent <- round(connaissance_envie_invest_dans_com_dt$Freq / sum(connaissance_envie_invest_dans_com_dt$Freq) * 100)
+
+# Graphique
+ggplot(connaissance_envie_invest_dans_com_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "Connaissance sur le souhait d'investissement des bénévoles", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(connaissance_envie_invest_dans_com_dt$Freq), 
+                                max(connaissance_envie_invest_dans_com_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
 
 ## Avez-vous l’impression que les prises de décision sont suffisamment transparentes ?
 
-transparence_decision = `Q990564. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+transparence_decision_dt <- as.data.frame(table(dt3$transparence_decision))
+
+# calcul des frequences
+transparence_decision_dt$Freq <- as.numeric(as.character(transparence_decision_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$transparence_decision <- factor(dt3$transparence_decision, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+transparence_decision_dt <- as.data.frame(table(dt3$transparence_decision))
+
+# Renommer proprement
+colnames(transparence_decision_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+transparence_decision_dt$pourcent <- round(transparence_decision_dt$Freq / sum(transparence_decision_dt$Freq) * 100)
+
+# Graphique
+ggplot(transparence_decision_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "Transparence dans les prises de décision", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(transparence_decision_dt$Freq), 
+                                max(transparence_decision_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
 
 ## Avez-vous l’impression que la gestion de l’argent est suffisamment transparente ?
 
-transparence_argent = `Q610635. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+transparence_argent_dt <- as.data.frame(table(dt3$transparence_argent))
+
+# calcul des frequences
+transparence_argent_dt$Freq <- as.numeric(as.character(transparence_argent_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$transparence_argent <- factor(dt3$transparence_argent, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+transparence_argent_dt <- as.data.frame(table(dt3$transparence_argent))
+
+# Renommer proprement
+colnames(transparence_argent_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+transparence_argent_dt$pourcent <- round(transparence_argent_dt$Freq / sum(transparence_argent_dt$Freq) * 100)
+
+# Graphique
+ggplot(transparence_argent_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "Transparence dans la gestion de l'argent", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(transparence_argent_dt$Freq), 
+                                max(transparence_argent_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
 
 ## Avez-vous le sentiment que la répartition du pouvoir et des responsabilités est équilibrée ?
 
-horizontalite = `Q713862. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+horizontalite_dt <- as.data.frame(table(dt3$horizontalite))
 
-### Commentaire
+# calcul des frequences
+horizontalite_dt$Freq <- as.numeric(as.character(horizontalite_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$horizontalite <- factor(dt3$horizontalite, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+horizontalite_dt <- as.data.frame(table(dt3$horizontalite))
+
+# Renommer proprement
+colnames(horizontalite_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+horizontalite_dt$pourcent <- round(horizontalite_dt$Freq / sum(horizontalite_dt$Freq) * 100)
+
+# Graphique
+ggplot(horizontalite_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "horizontalite (répartition pouvoirs et responsabilités)", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(horizontalite_dt$Freq), 
+                                max(horizontalite_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+### !!!! Commentaire
 
 horizontalite_com = 
 
 ## Sur votre identité queer : Est-ce que vous vous sentez inclus.e du fait de votre identité queer au sein du Boucan ?
 
-inclusion_queer = `Q990566. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+inclusion_queer_dt <- as.data.frame(table(dt3$inclusion_queer))
+
+# calcul des frequences
+inclusion_queer_dt$Freq <- as.numeric(as.character(inclusion_queer_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$inclusion_queer <- factor(dt3$inclusion_queer, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+inclusion_queer_dt <- as.data.frame(table(dt3$inclusion_queer))
+
+# Renommer proprement
+colnames(inclusion_queer_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+inclusion_queer_dt$pourcent <- round(inclusion_queer_dt$Freq / sum(inclusion_queer_dt$Freq) * 100)
+
+# Graphique
+ggplot(inclusion_queer_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "Inclusion identité queer", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(inclusion_queer_dt$Freq), 
+                                max(inclusion_queer_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
 
 ## Sur les autres discriminations, seulement pour les personnes concernées : Est-ce que vous vous sentez inclus.e du fait de votre identité intersectionnelle au sein du Boucan ?
 
-inclusion_intersectionnelle = `Q990567. `
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+inclusion_intersectionnelle_dt <- as.data.frame(table(dt3$inclusion_intersectionnelle))
 
-### Commentaire
+# calcul des frequences
+inclusion_intersectionnelle_dt$Freq <- as.numeric(as.character(inclusion_intersectionnelle_dt$Freq))
+
+# Définir toutes les modalités attendues
+modalites <- c("1", "2", "3", "4", "5", "Non concerné.e")
+
+# Transformer en facteur avec tous les niveaux
+dt3$inclusion_intersectionnelle <- factor(dt3$inclusion_intersectionnelle, levels = modalites)
+
+# Table avec toutes les modalités (même à 0)
+inclusion_intersectionnelle_dt <- as.data.frame(table(dt3$inclusion_intersectionnelle))
+
+# Renommer proprement
+colnames(inclusion_intersectionnelle_dt) <- c("Var1", "Freq")
+
+# Calcul des pourcentages
+inclusion_intersectionnelle_dt$pourcent <- round(inclusion_intersectionnelle_dt$Freq / sum(inclusion_intersectionnelle_dt$Freq) * 100)
+
+# Graphique
+ggplot(inclusion_intersectionnelle_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  scale_fill_manual(values = rainbow(length(modalites))) +
+  labs(x = "Inclusion intersectionnelle", y = "Nombre de personnes",
+       title = "") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(min(inclusion_intersectionnelle_dt$Freq), 
+                                max(inclusion_intersectionnelle_dt$Freq + 2))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+### !!!! Commentaire
 
 inclusion_com =`Q990568. 
+
+
+## !!!!!!!!!!!!!!!!Décompte des personnes directement cité.es 
+
+
+```{r}
+# prenoms_ref <- c("Clémence", "Elvire", "Zoé", "Audrey", "Sandrine")
+# 
+# # table anonymisation
+# anonymisation <- tibble(
+#   prenom = prenoms_ref,
+#   code = paste("Personne", seq_along(prenoms_ref))
+# )
+# 
+# dt_all_com <- problem_com_dt1
+# 
+# # détection
+# prenoms_dt <- dt_all_com %>%
+#   mutate(
+#     prenoms = map(problem_com, function(txt) {
+#       str_extract_all(txt, paste(prenoms_ref, collapse = "|"))[[1]]
+#     })
+#   )
+# 
+# # explosion + nettoyage + anonymisation
+# prenoms_long <- prenoms_dt %>%
+#   unnest(prenoms) %>%
+#   distinct(id, prenoms) %>%  # évite doublons dans une même réponse
+#   left_join(anonymisation, by = c("prenoms" = "prenom"))
+# 
+# # comptage anonymisé
+# prenoms_counts <- prenoms_long %>%
+#   count(code, sort = TRUE)
+# 
+# 
+# # =========================
+# # 3. (OPTION) ANONYMISER LES TEXTES
+# # =========================
+# 
+# dt_anonyme <- dt_all_com %>%
+#   mutate(
+#     problem_com = reduce2(
+#       anonymisation$prenom,
+#       anonymisation$code,
+#       ~ str_replace_all(.x, fixed(.y), ..2),
+#       .init = problem_com
+#     )
+#   )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+prenoms_ref <- c("Clémence", "Elvire", "Zoé", "Audrey", "Sandrine")
+
+
+# problem_com_dt1, be_dt1
+
+dt_all_com <- rbind(problem_com_dt1)
+
+prenoms_dt <- problem_com_dt1 %>%
+  mutate(
+    prenoms = map(problem_com, function(txt) {
+      prenoms_ref[str_detect(txt, paste(prenoms_ref, collapse = "|"))]
+    })
+  )
+
+prenoms_long <- prenoms_dt %>%
+  unnest(prenoms)
+
+prenoms_counts <- prenoms_long %>%
+  count(prenoms, sort = TRUE)
+```
+
 
 # Idées d'amélioration
 
