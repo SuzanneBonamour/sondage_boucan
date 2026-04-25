@@ -18,7 +18,9 @@ format:
 self-contained: true
 ---
 
-![](logo_boucan.png){ width=150px }
+<div style="text-align: center;">
+  <img src="logo_bouucan.png" width="300">
+</div>
 
 # Contexte 
 
@@ -197,7 +199,7 @@ dt3 <- dt2 %>%
 ```
 
 
-```{r echo=TRUE}
+```{r echo=TRUE, include=FALSE}
 # Données d'origine
 
 # head(dt3)
@@ -651,6 +653,19 @@ nb_rep_problem_com = length(problem_com_dt1$problem_com)
 ```
 
 `r nb_rep_problem_com` commentaires ont été écrits pour cette rubrique.
+
+Thèmes :
+
+| Thème                               | Mots-clés associés                                                                                     |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Conflit relationnel                 | agressif, houleux, conflit, débat, tension, affect, interpersonnel, irrespect, altercation, ordre, sec |
+| Manipulation                        | gaslighting                                                                                            |
+| Inclusivité / écoute                | écouté, légitime, inclusif, activant, trans, blanche, effacé, cis                                      |
+| Gouvernance                         | dirigiste, transparence, conseil, paralysé, collégial, descendant, employé, responsable                |
+| Manque de connaissance / expérience | comprendre, culture, expérience                                                                        |
+| Commentaire positif                 | table                                                                                                  |
+| Surcharge de travail                | épuisement                                                                                             |
+
 
 ```{r echo=FALSE, warning=FALSE}
 problem_com_dt2 <- problem_com_dt1 %>%
