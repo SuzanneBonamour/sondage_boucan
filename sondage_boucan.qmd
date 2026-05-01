@@ -8,8 +8,9 @@ format:
   html:
     theme: journal
     toc: true
+    lof: true
     number-sections: true
-    fig-cap-location: top
+    fig-cap-location: bottom
     link-citations: true
     document-css: false
     grid:
@@ -271,6 +272,8 @@ show_col(flag_random)
 ## Depuis combien de temps avez-vous rejoint le Boucan ?
 
 ```{r echo=FALSE, warning=FALSE}
+#| label: fig-temps
+#| fig-cap: "Durée d'adhésion à l'association"
 # mise en forme du tableau pour l'histogramme
 temps_boucan_dt <- as.data.frame(table(dt3$temps_boucan))
 
@@ -295,18 +298,21 @@ flag_random <- sample(flag, n)
 # Graphique
 ggplot(temps_boucan_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_bar(stat = "identity") +
-  geom_text(aes(label = paste0(round(pourcent, 1), " %")),
-            vjust = 2) +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
   labs(x = "Durée", y = "Nombre de personnes",
        title = "") +
   scale_fill_manual(values = flag_random) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+        legend.position = "none")
 ```
 
 ## Dans combien de commissions êtes-vous inscrit.e ?
 
 ```{r echo=FALSE, warning=FALSE}
+#| label: fig-combien_com
+#| fig-cap: "Nombre de commissions"
 # mise en forme du tableau pour l'histogramme
 combien_commission_dt <- as.data.frame(table(dt3$combien_commission))
 
@@ -338,18 +344,20 @@ ggplot(combien_commission_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "combien_commission", y = "Nombre de personnes",
+  labs(x = "Nombre de commission", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   scale_y_continuous(limits = c(min(combien_commission_dt$Freq), 
                                 max(combien_commission_dt$Freq + 2))) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
 ## Dans combien de commissions êtes-vous réellement actif.ve ?
 
 ```{r echo=FALSE, warning=FALSE}
+#| label: fig-combien_com_actif
+#| fig-cap: "Nombre de commission en tant que membre actif.ve"
 # mise en forme du tableau pour l'histogramme
 combien_commmision_actif_dt <- as.data.frame(table(dt3$combien_commmision_actif))
 
@@ -381,18 +389,20 @@ ggplot(combien_commmision_actif_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "combien_commmision_actif", y = "Nombre de personnes",
+  labs(x = "Nombre de commission (membre actif.ve)", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   scale_y_continuous(limits = c(min(combien_commmision_actif_dt$Freq), 
-                                max(combien_commmision_actif_dt$Freq + 2))) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                                max(combien_commmision_actif_dt$Freq + 0.5))) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
 ## A quelle fréquence venez-vous aux réunions plénières ?
 
 ```{r echo=FALSE, warning=FALSE}
+#| label: fig-freq_plen
+#| fig-cap: "Fréquence de participation aux réunions plénières"
 # mise en forme du tableau pour l'histogramme
 freq_plen_dt <- as.data.frame(table(dt3$freq_plen))
 
@@ -424,19 +434,22 @@ ggplot(freq_plen_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "freq_plen", y = "Nombre de personnes",
+  labs(x = "Fréquence de participation aux plénières", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   # scale_y_continuous(limits = c(min(freq_plen_dt$Freq),
   #                               max(freq_plen_dt$Freq + 2))) +
   expand_limits(y = max(freq_plen_dt$Freq) + 2) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
 ## Votre investissement a-t-il évolué depuis votre adhésion ? Pourquoi ?
 
 ```{r echo=FALSE, warning=FALSE}
+#| label: fig-evol_invest
+#| fig-cap: "Evolution de l'investissement au sein de l'association"
+
 # # mise en forme du tableau pour l'histogramme
 # evol_invest_dt <- as.data.frame(table(dt3$evol_invest))
 # 
@@ -468,7 +481,7 @@ ggplot(freq_plen_dt, aes(x = Var1, y = Freq, fill = Var1)) +
 #        title = "") +
 #   theme_minimal() +
 #   scale_y_continuous(limits = c(min(evol_invest_dt$Freq), max(evol_invest_dt$Freq + 2))) +
-#   theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  # theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
 #         legend.position = "none")
 ```
 
@@ -484,6 +497,8 @@ nb_rep_evol_invest_com = length(evol_invest_com_dt1$evol_invest_com)
 `r nb_rep_evol_invest_com` commentaires ont été écrits pour cette rubrique.
 
 ```{r echo=FALSE, warning=FALSE}
+#| label: fig-evol_invest_com
+#| fig-cap: "Dynamique d'évolution de l'investissement au sein de l'association"
 apport_dt2 <- evol_invest_com_dt1 %>%
   mutate(
     evolution = case_when(
@@ -533,7 +548,7 @@ ggplot(evol_counts,
   coord_flip() +
   labs(
     title = "",
-    x = "",
+    x = "Evolution investissement",
     y = "Nombre de réponses"
   ) +
   scale_fill_manual(values = flag_random) +
@@ -556,6 +571,8 @@ Pourquoi l'investissement diminue ?
 | Charge collective insuffisante | plus assez de personnes, charge, porter, seul                              |
 
 ```{r echo=FALSE, warning=FALSE}
+#| label: fig-evol_invest_com2
+#| fig-cap: "Thèmes associés à la diminution de l'investissement au sein de l'association"
 # diminution ----------------
 
 diminution_dt <- apport_dt2 %>%
@@ -653,6 +670,8 @@ Extraits choisis :
 -   *"Il y a un besoin de contrôle qui fait que tout est si long et compliqué"*
 
 ```{r echo=FALSE, eval=FALSE, warning=FALSE}
+#| label: fig-ressenti
+#| fig-cap: "Ressenti personnel au sein de l'association"
 ## Votre ressenti au sein de l’association a-t-il évolué depuis votre adhésion ?
 
 # mise en forme du tableau pour l'histogramme
@@ -686,17 +705,19 @@ ggplot(evol_ressenti_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "evol_ressenti", y = "Nombre de personnes",
+  labs(x = "Evolution ressenti", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   scale_y_continuous(limits = c(min(evol_ressenti_dt$Freq), max(evol_ressenti_dt$Freq + 2))) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
 ## Avez-vous rencontré des situations qui vous ont posé problème dans l'association ?
 
 ```{r echo=FALSE, warning=FALSE}
+#| label: fig-prob
+#| fig-cap: "Problème au sein de l'association"
 # mise en forme du tableau pour l'histogramme
 problem_dt <- as.data.frame(table(dt3$problem))
 
@@ -728,12 +749,12 @@ ggplot(problem_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "Problème", y = "Nombre de personnes",
+  labs(x = "Problème au sein de l'association", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   # scale_y_continuous(limits = c(min(problem_dt$Freq), max(problem_dt$Freq + 2))) +
   expand_limits(y = max(freq_plen_dt$Freq) + 5) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -760,6 +781,8 @@ nb_rep_problem_com = length(problem_com_dt1$problem_com)
 | Surcharge de travail                | épuisement                                                                                             |
 
 ```{r echo=FALSE, warning=FALSE}
+#| label: fig-prob_com
+#| fig-cap: "Thèmes associés aux problèmes rencontrés au sein de l'association"
 problem_com_dt2 <- problem_com_dt1 %>%
   mutate(
     themes = map(problem_com, function(txt) {
@@ -877,6 +900,8 @@ nb_rep_apport = length(apport_dt1$apport)
 | Existence de l'association en tant que telle | existe, présence                                                                        |
 
 ```{r echo=FALSE, warning=FALSE}
+#| label: fig-apport
+#| fig-cap: "Ce que l'association nous apporte personnellement"
 # ---- 1. Détection des thèmes ----
 apport_dt2 <- apport_dt1 %>%
   mutate(
@@ -1112,11 +1137,11 @@ ggplot(ressenti_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "Ressenti", y = "Nombre de personnes",
+  labs(x = "Comment vous sentez-vous au sein de l'association ?", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   scale_y_continuous(limits = c(min(ressenti_dt$Freq), max(ressenti_dt$Freq + 2))) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -1141,44 +1166,16 @@ ggplot(expression_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_bar(stat = "identity") +
   geom_text(aes(label = paste0(round(pourcent, 1), " %")),
             vjust = 2) +
-  labs(x = "expression", y = "Nombre de personnes",
+  labs(x = "Liberté d'expression", y = "Nombre de personnes",
        title = "") +
   scale_y_continuous(breaks = seq(0, 100, by = 1)) +
   scale_fill_manual(values = flag_random) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+        legend.position = "none")
 ```
 
 ## Vous sentez-vous écouté.e au Boucan ?
-
-```{r echo=FALSE, warning=FALSE}
-# mise en forme du tableau pour l'histogramme
-inclusion_dt <- as.data.frame(table(dt3$inclusion))
-
-# calcul des frequences
-inclusion_dt$Freq <- as.numeric(as.character(inclusion_dt$Freq))
-
-# Calcul des pourcentages
-inclusion_dt$pourcent <- round(inclusion_dt$Freq / sum(inclusion_dt$Freq) * 100)
-
-# color palette
-n <- 6
-flag_random <- sample(flag, n)
-
-# Graphique
-ggplot(inclusion_dt, aes(x = Var1, y = Freq, fill = Var1)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = paste0(round(pourcent, 1), " %")),
-            vjust = 2) +
-  labs(x = "inclusion", y = "Nombre de personnes",
-       title = "") +
-  scale_y_continuous(breaks = seq(0, max(inclusion_dt$Freq), by = 1)) +
-  scale_fill_manual(values = flag_random) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
-```
-
-## Vous sentez-vous facilement inclus.e au Boucan ?
 
 ```{r echo=FALSE, warning=FALSE}
 # mise en forme du tableau pour l'histogramme
@@ -1199,12 +1196,43 @@ ggplot(ecoute_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_bar(stat = "identity") +
   geom_text(aes(label = paste0(round(pourcent, 1), " %")),
             vjust = 2) +
-  labs(x = "ecoute", y = "Nombre de personnes",
+  labs(x = "Sentiment d'écoute", y = "Nombre de personnes",
        title = "") +
   scale_y_continuous(breaks = seq(0, 100, by = 1)) +
   scale_fill_manual(values = flag_random) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+        legend.position = "none")
+```
+
+## Vous sentez-vous facilement inclus.e au Boucan ?
+
+```{r echo=FALSE, warning=FALSE}
+# mise en forme du tableau pour l'histogramme
+inclusion_dt <- as.data.frame(table(dt3$inclusion))
+
+# calcul des frequences
+inclusion_dt$Freq <- as.numeric(as.character(inclusion_dt$Freq))
+
+# Calcul des pourcentages
+inclusion_dt$pourcent <- round(inclusion_dt$Freq / sum(inclusion_dt$Freq) * 100)
+
+# color palette
+n <- 6
+flag_random <- sample(flag, n)
+
+# Graphique
+ggplot(inclusion_dt, aes(x = Var1, y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(pourcent, " %")),
+            vjust = -0.5) +
+  labs(x = "Sentiment d'inclusion", y = "Nombre de personnes",
+       title = "") +
+  scale_fill_manual(values = flag_random) +
+  theme_minimal() +
+  scale_y_continuous(breaks = seq(0, 100, by = 1)) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+        legend.position = "none")
 ```
 
 ## Avez-vous le sentiment d'avoir des interactions globalement bienveillantes ?
@@ -1241,13 +1269,13 @@ ggplot(bienveillance_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "bienveillance", y = "Nombre de personnes",
+  labs(x = "Bienveillance", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   scale_y_continuous(limits = c(min(bienveillance_dt$Freq), 
-                                max(bienveillance_dt$Freq + 2)),
+                                max(bienveillance_dt$Freq + 0.5)),
                      breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -1481,7 +1509,7 @@ ggplot(be_positif_negatif_counts,
   coord_flip() +
   labs(
     title = "",
-    x = "",
+    x = "Sentiment de bien-être",
     y = "Nombre de réponses"
   ) +
   scale_fill_manual(values = flag_random) +
@@ -1501,7 +1529,7 @@ ggplot(be_detail_counts,
   coord_flip() +
   labs(
     title = "",
-    x = "",
+    x = "Sentiment de bien-être (conflit)",
     y = "Nombre de réponses"
   ) +
   scale_fill_manual(values = flag_random) +
@@ -1543,13 +1571,13 @@ ggplot(accueil_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "accueil", y = "Nombre de personnes",
+  labs(x = "Qualité de l'accueil", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
     scale_y_continuous(limits = c(min(accueil_dt$Freq), 
-                                max(accueil_dt$Freq + 1)),
+                                max(accueil_dt$Freq + 0.5)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -1692,13 +1720,13 @@ ggplot(connaissance_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "connaissance", y = "Nombre de personnes",
+  labs(x = "Connaissance de l'asso pour implication", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   scale_y_continuous(limits = c(min(connaissance_dt$Freq), 
-                                max(connaissance_dt$Freq + 1)),
+                                max(connaissance_dt$Freq + 0.5)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -1813,7 +1841,7 @@ ggplot(theme_counts,
   coord_flip() +
   labs(
     title = "",
-    x = "",
+    x = "Thèmes associés à la connaissance de l'asso pour implication",
     y = "Nombre de citations"
   ) +
   scale_fill_manual(values = flag_random) +
@@ -1824,7 +1852,7 @@ ggplot(theme_counts,
 
 Extrait choisi :
 
--   *"N'étant pas queer, je ne me sens pas légitime pour prendre des responsabilités. (Mais) Cela ne gêne pas l'implication"*
+- *"N'étant pas queer, je ne me sens pas légitime pour prendre des responsabilités. (Mais) Cela ne gêne pas l'implication"*
 
 ## Trouvez-vous les réunions plénières fonctionnelles et efficaces ?
 
@@ -1861,13 +1889,13 @@ ggplot(plen_fonc_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "Efficacité de fonctionnement des plénière", y = "Nombre de personnes",
+  labs(x = "Efficacité de fonctionnement des plénières", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   scale_y_continuous(limits = c(min(plen_fonc_dt$Freq), 
                                 max(plen_fonc_dt$Freq + 1)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -1979,7 +2007,7 @@ ggplot(theme_counts,
   coord_flip() +
   labs(
   title = "",
-  x = "",
+  x = "Thèmes associés au fonctionnement et à l'efficacité des plénières",
   y = "Nombre de citations"
 ) +
   scale_fill_manual(values = flag_random) +
@@ -2032,13 +2060,13 @@ ggplot(commission_fonc_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "commission_fonc", y = "Nombre de personnes",
+  labs(x = "Fonctionnement des commissions", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   scale_y_continuous(limits = c(min(commission_fonc_dt$Freq), 
                                 max(commission_fonc_dt$Freq + 0.6)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -2152,7 +2180,7 @@ ggplot(theme_counts,
   coord_flip() +
   labs(
     title = "",
-    x = "",
+    x = "Thèmes associés au fonctionnement des commissions",
     y = "Nombre de citations"
   ) +
   scale_fill_manual(values = flag_random) +
@@ -2200,13 +2228,13 @@ ggplot(lien_commission_cc_plen_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "liens entre les commissions et le CC", y = "Nombre de personnes",
+  labs(x = "Liens entre les commissions, les plénières et le CC", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   scale_y_continuous(limits = c(min(lien_commission_cc_plen_dt$Freq), 
                                 max(lien_commission_cc_plen_dt$Freq + 0.5)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -2244,13 +2272,13 @@ ggplot(ref_commision_fonc_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   geom_text(aes(label = paste0(pourcent, " %")),
             vjust = -0.5) +
   scale_fill_manual(values = flag_random) +
-  labs(x = "Rôle attribué au référent des commissions", y = "Nombre de personnes",
+  labs(x = "Rôle fonctionnel attribués aux référents des commissions", y = "Nombre de personnes",
        title = "") +
   theme_minimal() +
   scale_y_continuous(limits = c(min(ref_commision_fonc_dt$Freq), 
                                 max(ref_commision_fonc_dt$Freq + 0.5)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -2294,7 +2322,7 @@ ggplot(orga_dans_commission_fonc_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   scale_y_continuous(limits = c(min(orga_dans_commission_fonc_dt$Freq), 
                                 max(orga_dans_commission_fonc_dt$Freq + 0.5)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -2400,7 +2428,7 @@ ggplot(theme_counts,
   coord_flip() +
   labs(
     title = "",
-    x = "",
+    x = "Thèmes associés au fonctionnement des commissions",
     y = "Nombre de citations"
   ) +
   scale_fill_manual(values = flag_random) +
@@ -2453,7 +2481,7 @@ ggplot(connaissance_envie_invest_dans_com_dt, aes(x = Var1, y = Freq, fill = Var
   scale_y_continuous(limits = c(min(connaissance_envie_invest_dans_com_dt$Freq), 
                                 max(connaissance_envie_invest_dans_com_dt$Freq + 0.55)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -2497,7 +2525,7 @@ ggplot(transparence_decision_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   scale_y_continuous(limits = c(min(transparence_decision_dt$Freq), 
                                 max(transparence_decision_dt$Freq + 0.5)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -2541,7 +2569,7 @@ ggplot(transparence_argent_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   scale_y_continuous(limits = c(min(transparence_argent_dt$Freq), 
                                 max(transparence_argent_dt$Freq + 0.5)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -2585,7 +2613,7 @@ ggplot(horizontalite_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   scale_y_continuous(limits = c(min(horizontalite_dt$Freq), 
                                 max(horizontalite_dt$Freq + 0.5)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -2748,7 +2776,7 @@ ggplot(inclusion_queer_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   scale_y_continuous(limits = c(min(inclusion_queer_dt$Freq), 
                                 max(inclusion_queer_dt$Freq + 0.5)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -2792,7 +2820,7 @@ ggplot(inclusion_intersectionnelle_dt, aes(x = Var1, y = Freq, fill = Var1)) +
   scale_y_continuous(limits = c(min(inclusion_intersectionnelle_dt$Freq), 
                                 max(inclusion_intersectionnelle_dt$Freq + 0.5)),
                        breaks = seq(0, 100, by = 1)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
         legend.position = "none")
 ```
 
@@ -3012,28 +3040,173 @@ prenoms_counts <- prenoms_long %>%
 
 # Idées d'amélioration
 
-## Avez-vous des idées pour améliorer le fonctionnement des réunions plénières ?\`
+## !!!!!!!!Avez-vous des idées pour améliorer le fonctionnement des réunions plénières ?\`
 
-idee_plen_fonc =\`Q990569.
+```{r echo=FALSE, warning=FALSE}
+idee_plen_fonc_dt1 <- dt3 %>%
+  filter(!is.na(idee_plen_fonc)) %>%
+  select(id, idee_plen_fonc) %>% 
+  filter(!id==21)
+
+nb_rep_idee_plen_fonc = length(idee_plen_fonc_dt1$idee_plen_fonc)
+```
+
+`r nb_rep_problem_com` commentaires ont été écrits pour cette rubrique.
+
+| Thème                               | Mots-clés associés                                                                                     |
+|-------------------|-----------------------------------------------------|
+| Conflit relationnel                 | agressif, houleux, conflit, débat, tension, affect, interpersonnel, irrespect, altercation, ordre, sec |
+| Manipulation                        | gaslighting                                                                                            |
+| Inclusivité / écoute                | écouté, légitime, inclusif, activant, trans, blanche, effacé, cis                                      |
+| Gouvernance                         | dirigiste, transparence, conseil, paralysé, collégial, descendant, employé, responsable                |
+| Manque de connaissance / expérience | comprendre, culture, expérience                                                                        |
+| Commentaire positif                 | table                                                                                                  |
+| Surcharge de travail                | épuisement                                                                                             |
+
+```{r echo=FALSE, warning=FALSE}
+#| label: fig-idee_plen
+#| fig-cap: "Thèmes associés aux problèmes rencontrés au sein de l'association"
+problem_com_dt2 <- problem_com_dt1 %>%
+  mutate(
+    themes = map(problem_com, function(txt) {
+      
+      detected <- c(
+        if (str_detect(txt, "agressif|houleus|conflit|débat|tension|affect|interpersonnel|irrespect|altercation|ordre|sec"))
+          "Conflit relationnel",
+        
+        if (str_detect(txt, "gasligh"))
+          "Manipulation",
+        
+        if (str_detect(txt, "écouté|légitime|inclusiv|activant|trans|blanche|effac|cis"))
+          "Inclusivité / écoute",
+        
+        if (str_detect(txt, "dirigiste|transparence|conseil|paralyse|collégial|descendant|employé|responsable"))
+          "Gouvernance",
+        
+        if (str_detect(txt, "comprendre|culture|expérience"))
+          "Manque de connaissance ou d'expérience",
+        
+        if (str_detect(txt, "table"))
+          "Commentaire positif",
+        
+        if (str_detect(txt, "épuisement"))
+          "Surcharge de travail"
+      )
+      
+      detected <- unique(detected)
+      
+      if (length(detected) == 0) "Autre" else detected
+    })
+  )
+
+# ---- 2. Explosion ----
+themes_long <- problem_com_dt2 %>%
+  unnest(themes)
+
+# ---- 3. Comptages ----
+theme_counts <- themes_long %>%
+  count(themes, sort = TRUE)
+
+
+themes_long <- themes_long %>%
+  mutate(
+    themes = factor(themes,
+                    levels = c(
+                      "Conflit relationnel",
+                      "Manipulation",
+                      "Inclusivité / écoute",
+                      "Gouvernance",
+                      "Compréhension / expérience",
+                      "Surcharge de travail",
+                      "Commentaire positif",
+                      "Autre"
+                    ))
+  )
+
+cols_theme <- c(
+  "Conflit relationnel"        = "red",
+  "Manipulation"               = "black",
+  "Inclusivité / écoute"       = "purple",
+  "Gouvernance"                = "darkorange",
+  "Compréhension / expérience" = "skyblue",
+  "Surcharge de travail"       = "brown",
+  "Commentaire positif"        = "green",
+  "Autre"                      = "grey70"
+)
+
+# color palette
+n <- 7
+flag_random <- sample(flag, n)
+
+ggplot(theme_counts,
+       aes(x = reorder(themes, n),
+           y = n,
+           fill = themes)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "",
+    x = "",
+    y = "Nombre de citations"
+  ) +
+  scale_fill_manual(values = flag_random) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
 
 ## Avez-vous des idées pour améliorer le fonctionnement des commissions ? (Connaissance de l'investissement des autres, référent.e.s, lien entre le Conseil collégial et les réunions plénières...)\`
 
-idee_commission_fonc = \`Q427797.
+```{r echo=FALSE, warning=FALSE}
+idee_commission_fonc_dt1 <- dt3 %>%
+  filter(!is.na(idee_commission_fonc)) %>%
+  select(id, idee_commission_fonc) %>% 
+  filter(!id==23)
+
+nb_rep_idee_commission_fonc = length(idee_commission_fonc_dt1$idee_commission_fonc)
+```
 
 ## Avez-vous des idées pour améliorer l'inclusion ?\`
 
-idee_inclusion = \`Q276480.
+```{r echo=FALSE, warning=FALSE}
+idee_inclusion_dt1 <- dt3 %>%
+  filter(!is.na(idee_inclusion)) %>%
+  select(id, idee_inclusion) #%>% 
+  # filter(!id==23)
+
+nb_rep_idee_inclusion = length(idee_inclusion_dt1$idee_inclusion)
+```
 
 ## Avez-vous des idées pour améliorer la prise de décision,  l'horizontalité et la répartition du pouvoir ?\`
 
-idee_horizontalite = \`Q985032.
+```{r echo=FALSE, warning=FALSE}
+idee_horizontalite_dt1 <- dt3 %>%
+  filter(!is.na(idee_horizontalite)) %>%
+  select(id, idee_horizontalite) #%>% 
+  # filter(!id==23)
+
+nb_rep_idee_horizontalite = length(idee_horizontalite_dt1$idee_horizontalite)
+```
 
 ## Avez-vous des idées pour améliorer la gestion de l'argent et/ou sa transparence ?\`
 
-idee_transparence_argent = \`Q353448.
+```{r echo=FALSE, warning=FALSE}
+idee_transparence_argent_dt1 <- dt3 %>%
+  filter(!is.na(idee_transparence_argent)) %>%
+  select(id, idee_transparence_argent) %>% 
+  filter(!id==39)
 
-# Expression libre
+nb_rep_idee_horizontalite = length(idee_horizontalite_dt1$idee_transparence_argent)
+```
 
-## Vous pouvez vous exprimer ici sur toute autre idée pour améliorer le fonctionnement au Boucan\`
+# Vous pouvez vous exprimer ici sur toute autre idée pour améliorer le fonctionnement au Boucan\`
 
-idee_autre = \`Q331405.
+```{r echo=FALSE, warning=FALSE}
+idee_autre_dt1 <- dt3 %>%
+  filter(!is.na(idee_autre)) %>%
+  select(id, idee_autre) # %>% 
+  # filter(!id==39)
+
+nb_rep_idee_autre = length(idee_autre_dt1$idee_autre)
+```
+
